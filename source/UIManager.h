@@ -2,6 +2,7 @@
 #include "Singleton.h"
 #include "widgets/Window.h"
 #include "include/RUIN.h"
+#include "include/Commands.h"
 
 #include <string>
 #include <unordered_map>
@@ -9,6 +10,7 @@
 
 namespace RUIN
 {
+
 
 	class UIManager final : public Singleton<UIManager>
 	{

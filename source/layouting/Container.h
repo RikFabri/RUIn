@@ -51,7 +51,7 @@ namespace RUIN
 
 		AlignHelper m_AlignHelper;
 
-		std::vector < std::unique_ptr<IRenderable>> m_Renderables;
+		std::vector<std::unique_ptr<IRenderable>> m_Renderables;
 		std::vector<RenderArea> m_RenderAreaPerRenderable;
 	};
 

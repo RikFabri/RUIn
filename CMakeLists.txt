@@ -26,6 +26,12 @@ file(GLOB MATH_SOURCES
     "source/math/*.h"
 )
 
+file(GLOB INCLUDE_FILES
+    "source/include/*.h"
+)
+
+source_group("include" FILES ${INCLUDE_FILES})
+
 source_group("widgets" FILES ${WIDGET_SOURCES})
 source_group("layouting" FILES ${LAYOUTING_SOURCES})
 source_group("math" FILES ${MATH_SOURCES})
@@ -36,6 +42,7 @@ add_library(RUIn SHARED source/RUIN.cpp source/UIManager.cpp
     ${LAYOUTING_SOURCES}
     ${TINYXML_SOURCES}
     ${MATH_SOURCES}
+    ${INCLUDE_FILES}
 )
 
 target_include_directories(RUIn PRIVATE 
