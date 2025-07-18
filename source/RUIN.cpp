@@ -16,3 +16,8 @@ void RUIN::RenderUI()
 {
     UIManager::GetInstance().Render();
 }
+
+void RUIN::LoadUIFromXML(const char* path)
+{
+    UIManager::GetInstance().LoadXML(path);
+}

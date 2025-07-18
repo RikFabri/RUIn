@@ -14,4 +14,6 @@ namespace RUIN
 
     API void UpdateUI();
     API void RenderUI();
+
+    API void LoadUIFromXML(const char* path);
 }

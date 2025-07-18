@@ -2,7 +2,8 @@
 #include "../UIManager.h"
 
 RUIN::Window::Window(int width, int height) 
-	: m_Width(width)
+	: UIContainer(nullptr)
+	, m_Width(width)
 	, m_Height(height)
 {
 }
