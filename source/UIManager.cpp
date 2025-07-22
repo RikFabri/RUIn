@@ -5,8 +5,7 @@
 #include "widgets/Label.h"
 
 RUIN::UIManager::UIManager()
-	: m_Window( 200, 100 )
-	, m_DrawRectangle{ nullptr }
+	: m_Window( 800, 600 )
 {
 	RegisterBuiltInWidgetFactories(); 
 }
@@ -29,7 +28,10 @@ void RUIN::UIManager::LoadXML(const std::string& path)
 	assert(result == XML_SUCCESS);
 
 	auto* pRoot = doc.RootElement();
-	m_Window.AddChildWidget(pRoot);
+	for (auto* e = pRoot->FirstChildElement(); e; e = e->NextSiblingElement())
+	{
+		m_Window.AddChildWidget(e);
+	}
 }
 
 void RUIN::UIManager::Update()
@@ -44,14 +46,29 @@ void RUIN::UIManager::Render()
 	m_Window.Render(ra);
 }
 
-void RUIN::UIManager::SetDrawRectangleCb(DrawRectangleCb cb)
+void RUIN::UIManager::SetCallbacks(const Callbacks& cb)
 {
-	m_DrawRectangle = cb;
+	m_Callbacks = cb;
 }
 
 void RUIN::UIManager::DrawRectangle(const RenderArea& ra) const
 {
-	m_DrawRectangle(ra.x, ra.y, ra.w, ra.h);
+	m_Callbacks.drawRectangleFn(ra.GetRect(), {125, 125, 0, 255});
+}
+
+void* RUIN::UIManager::AllocateTextureFromText(const std::string& text) const
+{
+	return m_Callbacks.allocateTextureFromTextFn(text.c_str());
+}
+
+void RUIN::UIManager::QueryTextureDimensions(const void* texture, uint32_t& width, uint32_t& height) const
+{
+	m_Callbacks.queryTextureDimensions(texture, &width, &height);
+}
+
+void RUIN::UIManager::DrawTexture(void* texture, const RenderArea& ra) const
+{
+	m_Callbacks.drawTextureFn(ra.GetRect(), texture);
 }
 
 void RUIN::UIManager::RegisterWidgetFactory(const std::string& widgetType, const WidgetFactoryFn& factoryFunc)
@@ -59,7 +76,7 @@ void RUIN::UIManager::RegisterWidgetFactory(const std::string& widgetType, const
 	m_WidgetFactories[widgetType] = factoryFunc;
 }
 
-IRenderable* RUIN::UIManager::CreateWidgetFromType(const std::string& widgetType, tinyxml2::XMLElement* pElement)
+RUIN::IRenderable* RUIN::UIManager::CreateWidgetFromType(const std::string& widgetType, tinyxml2::XMLElement* pElement)
 {
 	assert(m_WidgetFactories.contains(widgetType));
 

@@ -48,7 +48,7 @@ RUIN::LeafNode::LeafNode(tinyxml2::XMLElement* e)
 	m_MarginRightBottom.y = marginBottom;
 }
 
-RenderArea RUIN::LeafNode::CalculateUsedContentArea(const RenderArea& availableArea)
+RUIN::RenderArea RUIN::LeafNode::CalculateUsedContentArea(const RenderArea& availableArea)
 {
 	const auto dims = GetDimensions();
 
@@ -56,30 +56,32 @@ RenderArea RUIN::LeafNode::CalculateUsedContentArea(const RenderArea& availableA
 
 	switch (m_HorizontalFillMode)
 	{
+	case LeafNode::FillMode::Center:
+		rc.x += (availableArea.w - dims.x) / 2.f;
+		break;
 	case LeafNode::FillMode::Right:
 		rc.x += availableArea.w - dims.x;
-	case LeafNode::FillMode::Left:
+		break;
+	}
+
+	if (m_HorizontalFillMode != LeafNode::FillMode::Stretch)
+	{
 		rc.w = dims.x;
-		break;
-	case LeafNode::FillMode::Center:
-		rc.w = dims.x + (availableArea.w - dims.x) / 2.f;
-		break;
-	case LeafNode::FillMode::Stretch:
-		break;
 	}
 
 	switch (m_VerticalFillMode)
 	{
 	case LeafNode::FillMode::Right:
 		rc.y += availableArea.h - dims.y;
-	case LeafNode::FillMode::Left:
-		rc.h = dims.y;
 		break;
 	case LeafNode::FillMode::Center:
-		rc.h = dims.y + (availableArea.h - dims.y) / 2.f;
+		rc.y += (availableArea.h - dims.y) / 2.f;
 		break;
-	case LeafNode::FillMode::Stretch:
-		break;
+	}
+
+	if (m_VerticalFillMode != LeafNode::FillMode::Stretch)
+	{
+		rc.h = dims.y;
 	}
 
 	// Fit inside of area

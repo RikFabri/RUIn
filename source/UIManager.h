@@ -20,8 +20,11 @@ namespace RUIN
 		void Update();
 		void Render();
 
-		void SetDrawRectangleCb(DrawRectangleCb cb);
+		void SetCallbacks(const Callbacks& cb);
 		void DrawRectangle(const RenderArea& ra) const;
+		void* AllocateTextureFromText(const std::string& text) const;
+		void QueryTextureDimensions(const void* texture, uint32_t& width, uint32_t& height) const;
+		void DrawTexture(void* texture, const RenderArea& ra) const;
 
 
 		using WidgetFactoryFn = std::function<IRenderable*(tinyxml2::XMLElement*)>;
@@ -35,7 +38,7 @@ namespace RUIN
 
 		Window m_Window;
 
-		DrawRectangleCb m_DrawRectangle;
+		Callbacks m_Callbacks;
 
 		std::unordered_map<std::string, WidgetFactoryFn> m_WidgetFactories;
 	};

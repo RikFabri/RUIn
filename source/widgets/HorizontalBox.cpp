@@ -7,7 +7,7 @@ RUIN::HorizontalBox::HorizontalBox(tinyxml2::XMLElement* e)
 	e->QueryBoolAttribute("isFlexible", &m_Flex);
 }
 
-RenderArea RUIN::HorizontalBox::GetAreaForChild(const RenderArea& availableArea, RenderArea& usedArea, RenderContext& ctx) const
+RUIN::RenderArea RUIN::HorizontalBox::GetAreaForChild(const RenderArea& availableArea, RenderArea& usedArea, RenderContext& ctx) const
 {
 	RenderArea rc = availableArea;
 
@@ -15,7 +15,7 @@ RenderArea RUIN::HorizontalBox::GetAreaForChild(const RenderArea& availableArea,
 	{
 		const float width = availableArea.w / GetNumChildren();
 		rc.w = width;
-		rc.x = width * ctx.childIndex;
+		rc.x += width * ctx.childIndex;
 	}
 	else
 	{

@@ -13,12 +13,12 @@ void RUIN::Window::Render(const RenderArea& targetArea)
 	RenderArea ra = targetArea;
 	ra.w = m_Width;
 	ra.h = m_Height;
-	UIManager::GetInstance().DrawRectangle(ra);
+	//UIManager::GetInstance().DrawRectangle(ra);
 
 	UIContainer::Render(ra);
 }
 
-RenderArea RUIN::Window::GetAreaForChild(const RenderArea& availableArea, RenderArea& usedArea, RenderContext& ctx) const
+RUIN::RenderArea RUIN::Window::GetAreaForChild(const RenderArea& availableArea, RenderArea& usedArea, RenderContext& ctx) const
 {
 	RenderArea ra{};
 	ra.w = m_Width;

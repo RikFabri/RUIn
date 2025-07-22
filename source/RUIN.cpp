@@ -2,9 +2,20 @@
 #include <iostream>
 #include "UIManager.h"
 
-void RUIN::SetDrawRectangleCallback(DrawRectangleCb cb)
+
+bool RUIN::InitializeCallbacks(const Callbacks& callbacks)
 {
-    UIManager::GetInstance().SetDrawRectangleCb(cb);
+    if (callbacks.allocateTextureFromImageFn == nullptr ||
+        callbacks.allocateTextureFromTextFn == nullptr ||
+        callbacks.drawRectangleFn == nullptr ||
+        callbacks.drawTextureFn == nullptr)
+    {
+        return false;
+    }
+
+    UIManager::GetInstance().SetCallbacks(callbacks);
+
+    return true;
 }
 
 void RUIN::UpdateUI()

@@ -11,15 +11,14 @@ namespace RUIN
 	public:
 		Label(tinyxml2::XMLElement* element);
 
-		void Render(const RenderArea& targetArea) override
-		{
-			std::cout << m_Text;
-		}
+		void Render(const RenderArea& targetArea) override;
 
 	private:
 		Erm::vec2f GetDimensions() override;
 
 		std::string m_Text;
+
+		void* m_pTextImage;
 	};
 
 }

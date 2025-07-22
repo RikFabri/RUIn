@@ -99,7 +99,7 @@ void RUIN::UIContainer::Render(const RenderArea& targetArea)
 	m_RenderAreaPerRenderable.clear();
 }
 
-RenderArea RUIN::UIContainer::CalculateUsedContentArea(const RenderArea& availableArea)
+RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const RenderArea& availableArea)
 {
 	RenderContext ctx{};
 	RenderArea usedArea{};
@@ -143,11 +143,8 @@ RenderArea RUIN::UIContainer::CalculateUsedContentArea(const RenderArea& availab
 
 void RUIN::UIContainer::AddChildWidget(tinyxml2::XMLElement* element)
 {
-	for (auto* e = element->FirstChildElement(); e; e = e->NextSiblingElement())
-	{
-		auto* pWidget = UIManager::GetInstance().CreateWidgetFromType(e->Name(), e);
-		m_Renderables.emplace_back(pWidget);
-	}
+	auto* pWidget = UIManager::GetInstance().CreateWidgetFromType(element->Name(), element);
+	m_Renderables.emplace_back(pWidget);
 }
 
 size_t RUIN::UIContainer::GetNumChildren() const

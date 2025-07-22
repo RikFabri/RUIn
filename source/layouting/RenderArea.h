@@ -1,12 +1,26 @@
 #pragma once
+#include "../include/RUIN.h"
 
-struct RenderArea
+namespace RUIN
 {
-	float x, y;
-	float w, h;
-
-	bool ContainsPoint(int px, int py) const
+	struct RenderArea
 	{
-		return x <= px && y <= py && x + w >= px && y + h >= py;
-	}
-};
+		float x, y;
+		float w, h;
+
+		bool ContainsPoint(int px, int py) const
+		{
+			return x <= px && y <= py && x + w >= px && y + h >= py;
+		}
+
+		Rectangle GetRect() const
+		{
+			return {
+				uint32_t(x),
+				uint32_t(y),
+				uint32_t(w),
+				uint32_t(h)
+			};
+		}
+	};
+}
