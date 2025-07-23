@@ -10,6 +10,7 @@ bool RUIN::InitializeCallbacks(const Callbacks& callbacks)
         callbacks.drawRectangleFn == nullptr ||
         callbacks.drawTextureFn == nullptr)
     {
+        UIManager::GetInstance().SetErrorMessage("Not all callbacks were provided!");
         return false;
     }
 
@@ -31,4 +32,9 @@ void RUIN::RenderUI()
 void RUIN::LoadUIFromXML(const char* path)
 {
     UIManager::GetInstance().LoadXML(path);
+}
+
+const char* RUIN::GetError()
+{
+    return UIManager::GetInstance().GetLatestErrorMessage();
 }

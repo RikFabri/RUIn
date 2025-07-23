@@ -47,4 +47,7 @@ namespace RUIN
     API void RenderUI();
 
     API void LoadUIFromXML(const char* path);
+
+    // Returns string containing the most recent error reported.
+    API const char* GetError();
 }

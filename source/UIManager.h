@@ -15,7 +15,7 @@ namespace RUIN
 	class UIManager final : public Singleton<UIManager>
 	{
 	public:
-		void LoadXML(const std::string& path);
+		bool LoadXML(const std::string& path);
 
 		void Update();
 		void Render();
@@ -30,6 +30,9 @@ namespace RUIN
 		using WidgetFactoryFn = std::function<IRenderable*(tinyxml2::XMLElement*)>;
 		void RegisterWidgetFactory(const std::string& widgetType, const WidgetFactoryFn& factoryFunc);
 		IRenderable* CreateWidgetFromType(const std::string& widgetType, tinyxml2::XMLElement* pElement);
+
+		void SetErrorMessage(std::string message);
+		const char* GetLatestErrorMessage() const;
 	private:
 		friend class Singleton<UIManager>;
 		UIManager();
@@ -41,6 +44,8 @@ namespace RUIN
 		Callbacks m_Callbacks;
 
 		std::unordered_map<std::string, WidgetFactoryFn> m_WidgetFactories;
+
+		std::string m_LatestErrorMessage;
 	};
 
 }

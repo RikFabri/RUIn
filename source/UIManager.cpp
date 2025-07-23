@@ -1,11 +1,12 @@
 #include "UIManager.h"
-#include <cassert>
+#include "debug.h"
 #include "widgets/HorizontalBox.h"
 #include "widgets/VerticalBox.h"
 #include "widgets/Label.h"
 
 RUIN::UIManager::UIManager()
 	: m_Window( 800, 600 )
+	, m_LatestErrorMessage()
 {
 	RegisterBuiltInWidgetFactories(); 
 }
@@ -19,19 +20,25 @@ void RUIN::UIManager::RegisterBuiltInWidgetFactories()
 	m_WidgetFactories["Label"] = [](tinyxml2::XMLElement* pElement) { return new Label(pElement); };
 }
 
-void RUIN::UIManager::LoadXML(const std::string& path)
+bool RUIN::UIManager::LoadXML(const std::string& path)
 {
 	using namespace tinyxml2;
 	XMLDocument doc;
 	const auto result = doc.LoadFile(path.c_str());
 
-	assert(result == XML_SUCCESS);
+	if (result != XML_SUCCESS)
+	{
+		UIManager::GetInstance().SetErrorMessage("Failed to load xml file");
+		return false;
+	}
 
 	auto* pRoot = doc.RootElement();
 	for (auto* e = pRoot->FirstChildElement(); e; e = e->NextSiblingElement())
 	{
 		m_Window.AddChildWidget(e);
 	}
+
+	return true;
 }
 
 void RUIN::UIManager::Update()
@@ -78,7 +85,17 @@ void RUIN::UIManager::RegisterWidgetFactory(const std::string& widgetType, const
 
 RUIN::IRenderable* RUIN::UIManager::CreateWidgetFromType(const std::string& widgetType, tinyxml2::XMLElement* pElement)
 {
-	assert(m_WidgetFactories.contains(widgetType));
+	RASSERT(m_WidgetFactories.contains(widgetType), "Widget type did not correspond to factory.");
 
 	return m_WidgetFactories[widgetType](pElement);
+}
+
+void RUIN::UIManager::SetErrorMessage(std::string message)
+{
+	m_LatestErrorMessage = std::move(message);
+}
+
+const char* RUIN::UIManager::GetLatestErrorMessage() const
+{
+	return m_LatestErrorMessage.c_str();
 }
