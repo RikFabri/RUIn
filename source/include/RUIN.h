@@ -1,5 +1,10 @@
 #pragma once
-#include <cstdint>
+
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifdef RUIN_BUILD
 #define API __declspec( dllexport )
@@ -7,50 +12,56 @@
 #define API __declspec( dllimport )
 #endif
 
-namespace RUIN
+typedef struct RUIN_Colour
 {
-    struct Colour
-    {
-        uint32_t r;
-        uint32_t g;
-        uint32_t b;
-        uint32_t a;
-    };
+    uint32_t r;
+    uint32_t g;
+    uint32_t b;
+    uint32_t a;
+} RUIN_Colour;
 
-    struct Rectangle
-    { 
-        uint32_t x;
-        uint32_t y;
-        uint32_t w;
-        uint32_t h;
-    };
+typedef struct RUIN_Rectangle
+{ 
+    uint32_t x;
+    uint32_t y;
+    uint32_t w;
+    uint32_t h;
+} RUIN_Rectangle;
 
-    typedef void(*DrawRectangleFn)(Rectangle, Colour);
-    typedef void(*DrawTextureFn)(Rectangle, void* texture);
-    typedef void*(*AllocateTextureFromImageFn)(const char* path);
-    typedef void*(*AllocateTextureFromTextFn)(const char* string);
-    typedef void(*FreeTexture)(const void* texture);
-    typedef void(*QueryTextureDimensions)(const void* texture, uint32_t* outWidth, uint32_t* outHeight);
+typedef void(*RUIN_DrawRectangleFn)(RUIN_Rectangle, RUIN_Colour);
+typedef void(*RUIN_DrawTextureFn)(RUIN_Rectangle, void* texture);
+typedef void*(*RUIN_AllocateTextureFromImageFn)(const char* path);
+typedef void*(*RUIN_AllocateTextureFromTextFn)(const char* string);
+typedef void(*RUIN_FreeTexture)(const void* texture);
+typedef void(*RUIN_QueryTextureDimensions)(const void* texture, uint32_t* outWidth, uint32_t* outHeight);
 
-    struct Callbacks
-    {
-        DrawRectangleFn drawRectangleFn;
-        DrawTextureFn drawTextureFn;
-        AllocateTextureFromImageFn allocateTextureFromImageFn;
-        AllocateTextureFromTextFn allocateTextureFromTextFn;
-        QueryTextureDimensions queryTextureDimensions;
-        FreeTexture freeTexture;
-    };
+typedef struct RUIN_Callbacks
+{
+    RUIN_DrawRectangleFn drawRectangleFn;
+    RUIN_DrawTextureFn drawTextureFn;
+    RUIN_AllocateTextureFromImageFn allocateTextureFromImageFn;
+    RUIN_AllocateTextureFromTextFn allocateTextureFromTextFn;
+    RUIN_QueryTextureDimensions queryTextureDimensions;
+    RUIN_FreeTexture freeTexture;
+} RUIN_Callbacks;
 
+typedef enum RUIN_Result
+{
+    RUIN_Fail = 0,
+    RUIN_Success = 1
+} RUIN_Result;
 
-    API bool InitializeCallbacks(const Callbacks& callbacks);
-    API void Shutdown();
+API RUIN_Result RUIN_InitializeCallbacks(const RUIN_Callbacks* callbacks);
+API void RUIN_Shutdown();
 
-    API void UpdateUI();
-    API void RenderUI();
+API void RUIN_UpdateUI();
+API void RUIN_RenderUI();
 
-    API void LoadUIFromXML(const char* path);
+API RUIN_Result RUIN_LoadUIFromXML(const char* path);
 
-    // Returns string containing the most recent error reported.
-    API const char* GetError();
+// Returns string containing the most recent error reported.
+API const char* RUIN_GetError();
+
+#ifdef __cplusplus
 }
+#endif

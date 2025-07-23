@@ -13,7 +13,7 @@ namespace RUIN
 			return x <= px && y <= py && x + w >= px && y + h >= py;
 		}
 
-		Rectangle GetRect() const
+		RUIN_Rectangle GetRect() const
 		{
 			return {
 				uint32_t(x),

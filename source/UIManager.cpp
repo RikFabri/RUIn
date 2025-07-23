@@ -58,7 +58,7 @@ void RUIN::UIManager::Render()
 	m_Window.Render(ra);
 }
 
-void RUIN::UIManager::SetCallbacks(const Callbacks& cb)
+void RUIN::UIManager::SetCallbacks(const RUIN_Callbacks& cb)
 {
 	m_Callbacks = cb;
 }

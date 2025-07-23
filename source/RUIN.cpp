@@ -2,45 +2,46 @@
 #include <iostream>
 #include "UIManager.h"
 
+using namespace RUIN;
 
-bool RUIN::InitializeCallbacks(const Callbacks& callbacks)
+RUIN_Result RUIN_InitializeCallbacks(const RUIN_Callbacks* callbacks)
 {
-    if (callbacks.allocateTextureFromImageFn == nullptr ||
-        callbacks.allocateTextureFromTextFn == nullptr ||
-        callbacks.drawRectangleFn == nullptr ||
-        callbacks.drawTextureFn == nullptr ||
-        callbacks.freeTexture == nullptr)
+    if (callbacks->allocateTextureFromImageFn == nullptr ||
+        callbacks->allocateTextureFromTextFn == nullptr ||
+        callbacks->drawRectangleFn == nullptr ||
+        callbacks->drawTextureFn == nullptr ||
+        callbacks->freeTexture == nullptr)
     {
         UIManager::GetInstance().SetErrorMessage("Not all callbacks were provided!");
-        return false;
+        return RUIN_Fail;
     }
 
-    UIManager::GetInstance().SetCallbacks(callbacks);
+    UIManager::GetInstance().SetCallbacks(*callbacks);
 
-    return true;
+    return RUIN_Success;
 }
 
-void RUIN::Shutdown()
+void RUIN_Shutdown()
 {
     return UIManager::GetInstance().ShutDown();
 }
 
-void RUIN::UpdateUI()
+void RUIN_UpdateUI()
 {
     UIManager::GetInstance().Update();
 }
 
-void RUIN::RenderUI()
+void RUIN_RenderUI()
 {
     UIManager::GetInstance().Render();
 }
 
-void RUIN::LoadUIFromXML(const char* path)
+RUIN_Result RUIN_LoadUIFromXML(const char* path)
 {
-    UIManager::GetInstance().LoadXML(path);
+    return UIManager::GetInstance().LoadXML(path) ? RUIN_Success : RUIN_Fail;
 }
 
-const char* RUIN::GetError()
+const char* RUIN_GetError()
 {
     return UIManager::GetInstance().GetLatestErrorMessage();
 }

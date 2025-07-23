@@ -35,7 +35,7 @@ namespace RUIN
 		void Update();
 		void Render();
 
-		void SetCallbacks(const Callbacks& cb);
+		void SetCallbacks(const RUIN_Callbacks& cb);
 		void DrawRectangle(const RenderArea& ra) const;
 		ClientTexture AllocateTextureFromText(const std::string& text);
 		void FreeTexture(void* texture);
@@ -60,7 +60,7 @@ namespace RUIN
 
 		Window m_Window;
 
-		Callbacks m_Callbacks;
+		RUIN_Callbacks m_Callbacks;
 
 		std::unordered_map<std::string, WidgetFactoryFn> m_WidgetFactories;
 
