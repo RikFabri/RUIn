@@ -135,13 +135,13 @@ RUIN::ClientTexture::ClientTexture(void* pClientData)
 {
 }
 
-RUIN::ClientTexture::ClientTexture(ClientTexture&& other)
+RUIN::ClientTexture::ClientTexture(ClientTexture&& other) noexcept
 {
 	m_pClientData = other.m_pClientData;
 	other.m_pClientData = nullptr;
 }
 
-RUIN::ClientTexture& RUIN::ClientTexture::operator=(ClientTexture&& other)
+RUIN::ClientTexture& RUIN::ClientTexture::operator=(ClientTexture&& other) noexcept
 {
 	if (this == &other)
 		return *this;

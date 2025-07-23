@@ -16,9 +16,9 @@ namespace RUIN
 		~ClientTexture();
 		ClientTexture();
 		ClientTexture(void* pClientData);
-		ClientTexture(ClientTexture&& other);
+		ClientTexture(ClientTexture&& other) noexcept;
 		ClientTexture(const ClientTexture& other) = delete;
-		ClientTexture& operator=(ClientTexture&& other);
+		ClientTexture& operator=(ClientTexture&& other) noexcept;
 
 		void* GetClientData() const;
 		void GetDimensions(uint32_t& width, uint32_t& height) const;
