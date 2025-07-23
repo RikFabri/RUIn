@@ -10,7 +10,22 @@
 
 namespace RUIN
 {
+	class ClientTexture
+	{
+	public:
+		~ClientTexture();
+		ClientTexture();
+		ClientTexture(void* pClientData);
+		ClientTexture(ClientTexture&& other);
+		ClientTexture(const ClientTexture& other) = delete;
+		ClientTexture& operator=(ClientTexture&& other);
 
+		void* GetClientData() const;
+		void GetDimensions(uint32_t& width, uint32_t& height) const;
+	private:
+
+		void* m_pClientData;
+	};
 
 	class UIManager final : public Singleton<UIManager>
 	{
@@ -22,9 +37,10 @@ namespace RUIN
 
 		void SetCallbacks(const Callbacks& cb);
 		void DrawRectangle(const RenderArea& ra) const;
-		void* AllocateTextureFromText(const std::string& text) const;
-		void QueryTextureDimensions(const void* texture, uint32_t& width, uint32_t& height) const;
-		void DrawTexture(void* texture, const RenderArea& ra) const;
+		ClientTexture AllocateTextureFromText(const std::string& text);
+		void FreeTexture(void* texture);
+		void QueryTextureDimensions(const ClientTexture& texture, uint32_t& width, uint32_t& height) const;
+		void DrawTexture(const ClientTexture& texture, const RenderArea& ra) const;
 
 
 		using WidgetFactoryFn = std::function<IRenderable*(tinyxml2::XMLElement*)>;
@@ -33,9 +49,12 @@ namespace RUIN
 
 		void SetErrorMessage(std::string message);
 		const char* GetLatestErrorMessage() const;
+
+		void ShutDown();
 	private:
 		friend class Singleton<UIManager>;
 		UIManager();
+		~UIManager();
 
 		void RegisterBuiltInWidgetFactories();
 
@@ -46,6 +65,9 @@ namespace RUIN
 		std::unordered_map<std::string, WidgetFactoryFn> m_WidgetFactories;
 
 		std::string m_LatestErrorMessage;
+
+		unsigned m_NumTextureAllocations = 0;
+		unsigned m_NumTextureFrees = 0;
 	};
 
 }

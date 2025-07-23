@@ -11,6 +11,11 @@ RUIN::UIManager::UIManager()
 	RegisterBuiltInWidgetFactories(); 
 }
 
+RUIN::UIManager::~UIManager()
+{
+	RASSERT(m_NumTextureAllocations == m_NumTextureFrees, "Not all allocated textures were freed.");
+}
+
 void RUIN::UIManager::RegisterBuiltInWidgetFactories()
 {
 	// TODO: This requires including all widgets in the manager, we should move these into a convenient macro in the widgets themselves
@@ -63,19 +68,26 @@ void RUIN::UIManager::DrawRectangle(const RenderArea& ra) const
 	m_Callbacks.drawRectangleFn(ra.GetRect(), {125, 125, 0, 255});
 }
 
-void* RUIN::UIManager::AllocateTextureFromText(const std::string& text) const
+RUIN::ClientTexture RUIN::UIManager::AllocateTextureFromText(const std::string& text)
 {
-	return m_Callbacks.allocateTextureFromTextFn(text.c_str());
+	++m_NumTextureAllocations;
+	return ClientTexture{ m_Callbacks.allocateTextureFromTextFn(text.c_str()) };
 }
 
-void RUIN::UIManager::QueryTextureDimensions(const void* texture, uint32_t& width, uint32_t& height) const
+void RUIN::UIManager::FreeTexture(void* texture)
 {
-	m_Callbacks.queryTextureDimensions(texture, &width, &height);
+	++m_NumTextureFrees;
+	m_Callbacks.freeTexture(texture);
 }
 
-void RUIN::UIManager::DrawTexture(void* texture, const RenderArea& ra) const
+void RUIN::UIManager::QueryTextureDimensions(const ClientTexture& texture, uint32_t& width, uint32_t& height) const
 {
-	m_Callbacks.drawTextureFn(ra.GetRect(), texture);
+	m_Callbacks.queryTextureDimensions(texture.GetClientData(), &width, &height);
+}
+
+void RUIN::UIManager::DrawTexture(const ClientTexture& texture, const RenderArea& ra) const
+{
+	m_Callbacks.drawTextureFn(ra.GetRect(), texture.GetClientData());
 }
 
 void RUIN::UIManager::RegisterWidgetFactory(const std::string& widgetType, const WidgetFactoryFn& factoryFunc)
@@ -98,4 +110,53 @@ void RUIN::UIManager::SetErrorMessage(std::string message)
 const char* RUIN::UIManager::GetLatestErrorMessage() const
 {
 	return m_LatestErrorMessage.c_str();
+}
+
+void RUIN::UIManager::ShutDown()
+{
+	m_Window.ClearWidgets();
+}
+
+RUIN::ClientTexture::~ClientTexture()
+{
+	if (!m_pClientData)
+		return;
+
+	UIManager::GetInstance().FreeTexture(m_pClientData);
+}
+
+RUIN::ClientTexture::ClientTexture()
+	: m_pClientData(nullptr)
+{
+}
+
+RUIN::ClientTexture::ClientTexture(void* pClientData)
+	: m_pClientData(pClientData)
+{
+}
+
+RUIN::ClientTexture::ClientTexture(ClientTexture&& other)
+{
+	m_pClientData = other.m_pClientData;
+	other.m_pClientData = nullptr;
+}
+
+RUIN::ClientTexture& RUIN::ClientTexture::operator=(ClientTexture&& other)
+{
+	if (this == &other)
+		return *this;
+
+	std::swap(m_pClientData, other.m_pClientData);
+
+	return *this;
+}
+
+void* RUIN::ClientTexture::GetClientData() const
+{
+	return m_pClientData;
+}
+
+void RUIN::ClientTexture::GetDimensions(uint32_t& width, uint32_t& height) const
+{
+	UIManager::GetInstance().QueryTextureDimensions(*this, width, height);
 }

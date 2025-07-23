@@ -1,5 +1,6 @@
 #pragma once
 #include "../layouting/LeafNode.h"
+#include "../UIManager.h"
 #include "tinyxml2.h"
 #include <string>
 #include <iostream>
@@ -18,7 +19,7 @@ namespace RUIN
 
 		std::string m_Text;
 
-		void* m_pTextImage;
+		ClientTexture m_pTextImage;
 	};
 
 }

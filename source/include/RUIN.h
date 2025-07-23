@@ -29,6 +29,7 @@ namespace RUIN
     typedef void(*DrawTextureFn)(Rectangle, void* texture);
     typedef void*(*AllocateTextureFromImageFn)(const char* path);
     typedef void*(*AllocateTextureFromTextFn)(const char* string);
+    typedef void(*FreeTexture)(const void* texture);
     typedef void(*QueryTextureDimensions)(const void* texture, uint32_t* outWidth, uint32_t* outHeight);
 
     struct Callbacks
@@ -38,10 +39,12 @@ namespace RUIN
         AllocateTextureFromImageFn allocateTextureFromImageFn;
         AllocateTextureFromTextFn allocateTextureFromTextFn;
         QueryTextureDimensions queryTextureDimensions;
+        FreeTexture freeTexture;
     };
 
 
     API bool InitializeCallbacks(const Callbacks& callbacks);
+    API void Shutdown();
 
     API void UpdateUI();
     API void RenderUI();

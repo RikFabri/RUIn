@@ -8,7 +8,8 @@ bool RUIN::InitializeCallbacks(const Callbacks& callbacks)
     if (callbacks.allocateTextureFromImageFn == nullptr ||
         callbacks.allocateTextureFromTextFn == nullptr ||
         callbacks.drawRectangleFn == nullptr ||
-        callbacks.drawTextureFn == nullptr)
+        callbacks.drawTextureFn == nullptr ||
+        callbacks.freeTexture == nullptr)
     {
         UIManager::GetInstance().SetErrorMessage("Not all callbacks were provided!");
         return false;
@@ -17,6 +18,11 @@ bool RUIN::InitializeCallbacks(const Callbacks& callbacks)
     UIManager::GetInstance().SetCallbacks(callbacks);
 
     return true;
+}
+
+void RUIN::Shutdown()
+{
+    return UIManager::GetInstance().ShutDown();
 }
 
 void RUIN::UpdateUI()

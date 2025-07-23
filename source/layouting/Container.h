@@ -38,6 +38,7 @@ namespace RUIN
 
 		size_t GetNumChildren() const;
 
+		void ClearWidgets();
 
 	protected:
 		struct RenderContext

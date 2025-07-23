@@ -151,3 +151,9 @@ size_t RUIN::UIContainer::GetNumChildren() const
 {
 	return m_Renderables.size();
 }
+
+void RUIN::UIContainer::ClearWidgets()
+{
+	m_Renderables.clear();
+	m_RenderAreaPerRenderable.clear();
+}

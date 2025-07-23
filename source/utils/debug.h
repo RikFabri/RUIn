@@ -1,6 +1,6 @@
 #pragma once
 
-#define RASSERT(condition, message) RUIN::AssertAndReport(condition, message);
+#define RASSERT(condition, message) RUIN::AssertAndReport(condition, message)
 
 namespace RUIN
 {
