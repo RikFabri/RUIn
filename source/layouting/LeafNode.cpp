@@ -4,48 +4,14 @@
 RUIN::LeafNode::LeafNode(tinyxml2::XMLElement* e)
 	: IRenderable()
 {
-	const auto getFillMode = [](const char* stretchMode)
-		{
-			if (strcmp(stretchMode, "right") == 0)
-			{
-				return FillMode::Right;
-			}
-			else if (strcmp(stretchMode, "center") == 0)
-			{
-				return FillMode::Center;
-			}
-			else if (strcmp(stretchMode, "stretch") == 0)
-			{
-				return FillMode::Stretch;
-			}
+	Create_widget_initializer(LeafNode);
+	Bind_method_to_XML(InitializeHorizontalFillmode, e, "horizontal-fillMode");
+	Bind_method_to_XML(InitializeVerticalFillmode, e, "vertical-fillMode");
 
-			return FillMode::Left;
-		};
-
-	const char* stretchMode = "left";
-	e->QueryStringAttribute("horizontal-fillMode", &stretchMode);
-	m_HorizontalFillMode = getFillMode(stretchMode);
-
-	stretchMode = "left";
-	e->QueryStringAttribute("vertical-fillMode", &stretchMode);
-	m_VerticalFillMode = getFillMode(stretchMode);
-
-	float marginLeft = 0;
-	e->QueryFloatAttribute("margin-left", &marginLeft);
-
-	float marginRight = 0;
-	e->QueryFloatAttribute("margin-right", &marginRight);
-
-	float marginTop = 0;
-	e->QueryFloatAttribute("margin-top", &marginTop);
-
-	float marginBottom = 0;
-	e->QueryFloatAttribute("margin-bottom", &marginBottom);
-
-	m_MarginLeftTop.x = marginLeft;
-	m_MarginLeftTop.y = marginTop;
-	m_MarginRightBottom.x = marginRight;
-	m_MarginRightBottom.y = marginBottom;
+	Bind_member_to_XML(m_MarginLeft, e, "margin-left");
+	Bind_member_to_XML(m_MarginRight, e, "margin-right");
+	Bind_member_to_XML(m_MarginTop, e, "margin-top");
+	Bind_member_to_XML(m_MarginBottom, e, "margin-bottom");
 }
 
 RUIN::RenderArea RUIN::LeafNode::CalculateUsedContentArea(const RenderArea& availableArea)
@@ -90,11 +56,51 @@ RUIN::RenderArea RUIN::LeafNode::CalculateUsedContentArea(const RenderArea& avai
 
 	// Apply margins
 	// We use pixel / size as a ratio and apply it to calculated area.
-	rc.x += m_MarginLeftTop.x / dims.x * rc.w;
-	rc.y += m_MarginLeftTop.y / dims.y * rc.h;
-	rc.w -= m_MarginRightBottom.x / dims.x * rc.w;
-	rc.h -= m_MarginRightBottom.y / dims.y * rc.h;
+	rc.x += m_MarginLeft / dims.x * rc.w;
+	rc.y += m_MarginTop / dims.y * rc.h;
+	rc.w -= m_MarginRight / dims.x * rc.w;
+	rc.h -= m_MarginBottom / dims.y * rc.h;
 	// End margins
 
 	return rc;
+}
+
+void RUIN::LeafNode::InitializeVerticalFillmode(const char* mode)
+{
+	if (!mode)
+	{
+		m_VerticalFillMode = FillMode::Left;
+		return;
+	}
+
+	m_VerticalFillMode = GetFillMode(mode);
+}
+
+void RUIN::LeafNode::InitializeHorizontalFillmode(const char* mode)
+{
+	if (!mode)
+	{
+		m_HorizontalFillMode = FillMode::Left;
+		return;
+	}
+
+	m_HorizontalFillMode = GetFillMode(mode);
+}
+
+RUIN::LeafNode::FillMode RUIN::LeafNode::GetFillMode(const char* fillMode)
+{
+	if (strcmp(fillMode, "right") == 0)
+	{
+		return FillMode::Right;
+	}
+	else if (strcmp(fillMode, "center") == 0)
+	{
+		return FillMode::Center;
+	}
+	else if (strcmp(fillMode, "stretch") == 0)
+	{
+		return FillMode::Stretch;
+	}
+
+	return FillMode::Left;
 }

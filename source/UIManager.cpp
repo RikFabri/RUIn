@@ -13,6 +13,7 @@ RUIN::UIManager::UIManager()
 
 RUIN::UIManager::~UIManager()
 {
+	RASSERT(m_ShutdownCalled, "Application closed without calling RUIN_Shutdown()");
 	RASSERT(m_NumTextureAllocations == m_NumTextureFrees, "Not all allocated textures were freed.");
 }
 
@@ -114,6 +115,7 @@ const char* RUIN::UIManager::GetLatestErrorMessage() const
 
 void RUIN::UIManager::ShutDown()
 {
+	m_ShutdownCalled = true;
 	m_Window.ClearWidgets();
 }
 

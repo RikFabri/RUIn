@@ -24,8 +24,16 @@ namespace RUIN
 		};
 		FillMode m_HorizontalFillMode;
 		FillMode m_VerticalFillMode;
-		Erm::vec2f m_MarginLeftTop;
-		Erm::vec2f m_MarginRightBottom;
+
+		float m_MarginLeft = 0.f;
+		float m_MarginTop = 0.f;
+		float m_MarginRight = 0.f;
+		float m_MarginBottom = 0.f;
+
+		void InitializeVerticalFillmode(const char* mode);
+		void InitializeHorizontalFillmode(const char* mode);
+		static FillMode GetFillMode(const char* fillMode);
+
 	};
 
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "RenderArea.h"
+#include "../widgets/databinding/DataBinding.h"
 
 namespace RUIN
 {
@@ -13,5 +14,9 @@ namespace RUIN
 
 		// Return what area you're using within the available area.
 		virtual RenderArea CalculateUsedContentArea(const RenderArea& availableArea) = 0;
+
+	protected:
+		XMLBindingCreationHelper _DataBindingDescriptor;
+		
 	};
 }

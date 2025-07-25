@@ -11,6 +11,11 @@ file(GLOB WIDGET_SOURCES
     "source/widgets/*.h"
 )
 
+file(GLOB BINDING_SOURCES
+    "source/widgets/databinding/*.cpp"
+    "source/widgets/databinding/*.h"
+)
+
 file(GLOB LAYOUTING_SOURCES
     "source/layouting/*.cpp"
     "source/layouting/*.h"
@@ -38,6 +43,7 @@ file(GLOB INCLUDE_FILES
 source_group("include" FILES ${INCLUDE_FILES})
 
 source_group("widgets" FILES ${WIDGET_SOURCES})
+source_group("widgets\\databinding" FILES ${BINDING_SOURCES})
 source_group("layouting" FILES ${LAYOUTING_SOURCES})
 source_group("math" FILES ${MATH_SOURCES})
 source_group("utils" FILES ${UTIL_SOURCES})
@@ -45,6 +51,7 @@ source_group("external\\tinyxml" FILES ${TINYXML_SOURCES})
 
 add_library(RUIn SHARED source/RUIN.cpp source/UIManager.cpp 
     ${WIDGET_SOURCES}
+    ${BINDING_SOURCES}
     ${LAYOUTING_SOURCES}
     ${TINYXML_SOURCES}
     ${MATH_SOURCES}

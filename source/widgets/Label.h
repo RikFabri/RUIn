@@ -15,11 +15,14 @@ namespace RUIN
 		void Render(const RenderArea& targetArea) override;
 
 	private:
+		void OnTextChanged();
 		Erm::vec2f GetDimensions() override;
 
 		std::string m_Text;
 
 		ClientTexture m_pTextImage;
+		int m_TestInt;
+		float m_TestFloat;
 	};
 
 }

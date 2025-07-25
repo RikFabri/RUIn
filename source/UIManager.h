@@ -68,6 +68,8 @@ namespace RUIN
 
 		unsigned m_NumTextureAllocations = 0;
 		unsigned m_NumTextureFrees = 0;
+
+		bool m_ShutdownCalled = false;
 	};
 
 }
