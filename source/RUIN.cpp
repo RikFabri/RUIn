@@ -41,6 +41,11 @@ RUIN_Result RUIN_LoadUIFromXML(const char* path)
     return UIManager::GetInstance().LoadXML(path) ? RUIN_Success : RUIN_Fail;
 }
 
+void RUIN_CursorMoved(int cursorX, int cursorY)
+{
+    UIManager::GetInstance().OnCursorMoved(cursorX, cursorY);
+}
+
 const char* RUIN_GetError()
 {
     return UIManager::GetInstance().GetLatestErrorMessage();

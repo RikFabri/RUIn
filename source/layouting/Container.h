@@ -33,6 +33,7 @@ namespace RUIN
 
 		void Render(const RenderArea& targetArea) override;
 		RenderArea CalculateUsedContentArea(const RenderArea& availableArea) override;
+		bool HandleMouseMoved(int cursorX, int cursorY) override;
 
 		void AddChildWidget(tinyxml2::XMLElement* element);
 
@@ -49,6 +50,7 @@ namespace RUIN
 
 	private:
 		virtual RenderArea GetAreaForChild(const RenderArea& availableArea, RenderArea& usedArea, RenderContext& ctx) const = 0;
+
 
 		AlignHelper m_AlignHelper;
 

@@ -59,6 +59,8 @@ API void RUIN_RenderUI();
 
 API RUIN_Result RUIN_LoadUIFromXML(const char* path);
 
+API void RUIN_CursorMoved(int cursorX, int cursorY);
+
 // Returns string containing the most recent error reported.
 API const char* RUIN_GetError();
 

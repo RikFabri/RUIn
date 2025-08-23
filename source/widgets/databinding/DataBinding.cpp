@@ -1,4 +1,5 @@
 #include "DataBinding.h"
+#include <iostream>
 
 RUIN::ChangeHandlerHelper::ChangeHandlerHelper(XMLBindingCreationHelper* pInitializer)
 	: m_pInitializer(pInitializer)
@@ -15,8 +16,23 @@ void RUIN::ChangeHandlerHelper::Then(void(*action)(void*), void* initialInstance
 
 void RUIN::XMLBindingCreationHelper::InitializeMethod(void(*method)(void*, const char*), tinyxml2::XMLElement* element, const char* attribute, void* instance)
 {
-	// TODO: save method
-	method(instance, element->Attribute(attribute));
+	const auto* attrib = element->FindAttribute(attribute);
+	if (!attrib)
+		return;
+
+	std::string val = attrib->Value();
+
+	bool isBinding;
+	const auto bindingName = ParseBinding(val, isBinding);
+
+	if (isBinding)
+	{
+		std::cout << "binding found for method. Not implemented yet.";
+	}
+	else
+	{
+		method(instance, val.c_str());
+	}
 }
 
 RUIN::ChangeHandlerHelper RUIN::XMLBindingCreationHelper::InitializeMember(size_t memberOffset, std::string& str, tinyxml2::XMLElement* element, const char* attribute)

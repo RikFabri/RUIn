@@ -3,6 +3,7 @@
 #include "widgets/HorizontalBox.h"
 #include "widgets/VerticalBox.h"
 #include "widgets/Label.h"
+#include "widgets/Button.h"
 
 RUIN::UIManager::UIManager()
 	: m_Window( 800, 600 )
@@ -24,6 +25,7 @@ void RUIN::UIManager::RegisterBuiltInWidgetFactories()
 	m_WidgetFactories["HorizontalBox"] = [](tinyxml2::XMLElement* pElement) { return new HorizontalBox(pElement); };
 	m_WidgetFactories["VerticalBox"] = [](tinyxml2::XMLElement* pElement) { return new VerticalBox(pElement); };
 	m_WidgetFactories["Label"] = [](tinyxml2::XMLElement* pElement) { return new Label(pElement); };
+	m_WidgetFactories["Button"] = [](tinyxml2::XMLElement* pElement) { return new Button(pElement); };
 }
 
 bool RUIN::UIManager::LoadXML(const std::string& path)
@@ -59,14 +61,19 @@ void RUIN::UIManager::Render()
 	m_Window.Render(ra);
 }
 
+void RUIN::UIManager::OnCursorMoved(int cursorX, int cursorY)
+{
+	m_Window.HandleMouseMoved(cursorX, cursorY);
+}
+
 void RUIN::UIManager::SetCallbacks(const RUIN_Callbacks& cb)
 {
 	m_Callbacks = cb;
 }
 
-void RUIN::UIManager::DrawRectangle(const RenderArea& ra) const
+void RUIN::UIManager::DrawRectangle(const RenderArea& ra, RUIN_Colour colour) const
 {
-	m_Callbacks.drawRectangleFn(ra.GetRect(), {125, 125, 0, 255});
+	m_Callbacks.drawRectangleFn(ra.GetRect(), colour);
 }
 
 RUIN::ClientTexture RUIN::UIManager::AllocateTextureFromText(const std::string& text)

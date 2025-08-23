@@ -35,8 +35,11 @@ namespace RUIN
 		void Update();
 		void Render();
 
+		// Input events
+		void OnCursorMoved(int cursorX, int cursorY);
+
 		void SetCallbacks(const RUIN_Callbacks& cb);
-		void DrawRectangle(const RenderArea& ra) const;
+		void DrawRectangle(const RenderArea& ra, RUIN_Colour colour) const;
 		ClientTexture AllocateTextureFromText(const std::string& text);
 		void FreeTexture(void* texture);
 		void QueryTextureDimensions(const ClientTexture& texture, uint32_t& width, uint32_t& height) const;

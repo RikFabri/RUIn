@@ -6,6 +6,7 @@
 
 RUIN::AlignHelper::AlignHelper(tinyxml2::XMLElement* e)
 {
+	// TODO: Should these use binding macros?
 	m_Stretch = false;
 	if (e == nullptr)
 	{
@@ -95,8 +96,6 @@ void RUIN::UIContainer::Render(const RenderArea& targetArea)
 		ra.y += targetArea.y;
 		renderable->Render(ra);
 	}
-
-	m_RenderAreaPerRenderable.clear();
 }
 
 RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const RenderArea& availableArea)
@@ -104,6 +103,7 @@ RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const RenderArea& a
 	RenderContext ctx{};
 	RenderArea usedArea{};
 
+	m_RenderAreaPerRenderable.clear();
 	m_RenderAreaPerRenderable.reserve(m_Renderables.size());
 	for (auto& renderable : m_Renderables)
 	{
@@ -156,4 +156,30 @@ void RUIN::UIContainer::ClearWidgets()
 {
 	m_Renderables.clear();
 	m_RenderAreaPerRenderable.clear();
+}
+
+bool RUIN::UIContainer::HandleMouseMoved(int cursorX, int cursorY)
+{
+	int count = 0;
+	for (auto& renderable : m_Renderables)
+	{
+		if (count >= m_RenderAreaPerRenderable.size())
+		{
+			return false;
+		}
+
+		const auto& renderArea = m_RenderAreaPerRenderable[count++];
+
+		if (renderArea.ContainsPoint(cursorX, cursorY))
+		{
+			const bool handled = renderable->HandleMouseMoved(cursorX, cursorY);
+			if (handled)
+			{
+				return true;
+			}
+		}
+
+	}
+
+	return false;
 }

@@ -21,8 +21,6 @@ namespace RUIN
 		std::string m_Text;
 
 		ClientTexture m_pTextImage;
-		int m_TestInt;
-		float m_TestFloat;
 	};
 
 }

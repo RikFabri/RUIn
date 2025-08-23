@@ -12,8 +12,6 @@
 
 namespace RUIN
 {
-	class XMLBindingCreationHelper;
-
 	template <typename T, void (T::* Member)()>
 	void ConvertMemberToGenericFreeFunction(void* instance) 
 	{
@@ -25,6 +23,8 @@ namespace RUIN
 	{
 		(static_cast<T*>(instance)->*Member)(data);
 	}
+
+	class XMLBindingCreationHelper;
 
 	// Returned by Bind_member_to_XML() to allow binding a changehandler
 	class ChangeHandlerHelper

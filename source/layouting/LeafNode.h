@@ -22,8 +22,8 @@ namespace RUIN
 			Center,
 			Stretch
 		};
-		FillMode m_HorizontalFillMode;
-		FillMode m_VerticalFillMode;
+		FillMode m_HorizontalFillMode = FillMode::Left;
+		FillMode m_VerticalFillMode = FillMode::Left;
 
 		float m_MarginLeft = 0.f;
 		float m_MarginTop = 0.f;

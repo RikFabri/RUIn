@@ -13,7 +13,7 @@ RUIN::Label::Label(tinyxml2::XMLElement* element)
 
 void RUIN::Label::Render(const RenderArea& targetArea)
 {
-	UIManager::GetInstance().DrawRectangle(targetArea);
+	UIManager::GetInstance().DrawRectangle(targetArea, { 125, 125, 0, 255 });
 	UIManager::GetInstance().DrawTexture(m_pTextImage, targetArea);
 }
 
