@@ -40,6 +40,9 @@ namespace RUIN
 		void OnCursorDown(int cursorX, int cursorY);
 		void OnCursorUp(int cursorX, int cursorY);
 
+		void RegisterNamedCallback(const std::string& name, std::function<void()> func);
+		void InvokeNamedCallback(const std::string& name) const;
+
 		void SetCallbacks(const RUIN_Callbacks& cb);
 		void DrawRectangle(const RenderArea& ra, RUIN_Colour colour) const;
 		ClientTexture AllocateTextureFromText(const std::string& text);
@@ -68,6 +71,7 @@ namespace RUIN
 		RUIN_Callbacks m_Callbacks;
 
 		std::unordered_map<std::string, WidgetFactoryFn> m_WidgetFactories;
+		std::unordered_map<std::string, std::function<void()>> m_NamedUserCallbacks;
 
 		std::string m_LatestErrorMessage;
 

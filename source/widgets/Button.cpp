@@ -6,6 +6,9 @@
 RUIN::Button::Button(tinyxml2::XMLElement* element)
 	: UIContainer(element)
 {
+	Create_widget_initializer(Button);
+
+	Bind_member_to_XML(m_OnClick, element, "onclick");
 }
 
 void RUIN::Button::Render(const RenderArea& targetArea)
@@ -50,10 +53,7 @@ bool RUIN::Button::HandleMouseDown(int cursorX, int cursorY)
 
 bool RUIN::Button::HandleMouseUp(int cursorX, int cursorY)
 {
-	//if (m_ButtonState == ButtonState::Down)
-	{
-		std::cout << "clicked!" << std::endl;
-	}
+	UIManager::GetInstance().InvokeNamedCallback(m_OnClick);
 
 	m_ButtonState = ButtonState::Default;
 

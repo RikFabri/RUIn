@@ -28,6 +28,8 @@ namespace RUIN
 		};
 		
 		ButtonState m_ButtonState = ButtonState::Default;
+
+		std::string m_OnClick;
 	};
 
 }

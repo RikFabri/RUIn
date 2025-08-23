@@ -5,6 +5,8 @@
 #include "widgets/Label.h"
 #include "widgets/Button.h"
 
+#include <format>
+
 RUIN::UIManager::UIManager()
 	: m_Window( 800, 600 )
 	, m_LatestErrorMessage()
@@ -74,6 +76,18 @@ void RUIN::UIManager::OnCursorDown(int cursorX, int cursorY)
 void RUIN::UIManager::OnCursorUp(int cursorX, int cursorY)
 {
 	m_Window.HandleMouseUp(cursorX, cursorY);
+}
+
+void RUIN::UIManager::RegisterNamedCallback(const std::string& name, std::function<void()> func)
+{
+	m_NamedUserCallbacks[name] = func;
+}
+
+void RUIN::UIManager::InvokeNamedCallback(const std::string& name) const
+{
+	RASSERT(m_NamedUserCallbacks.contains(name), std::format("Named callback {} wasn't registered!", name).c_str());
+
+	m_NamedUserCallbacks.at(name)();
 }
 
 void RUIN::UIManager::SetCallbacks(const RUIN_Callbacks& cb)

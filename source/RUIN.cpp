@@ -56,6 +56,11 @@ void RUIN_CursorDown(int cursorX, int cursorY)
     UIManager::GetInstance().OnCursorDown(cursorX, cursorY);
 }
 
+void RUIN_RegisterNamedCallback(const char* name, void(*func)(void))
+{
+    UIManager::GetInstance().RegisterNamedCallback(name, func);
+}
+
 const char* RUIN_GetError()
 {
     return UIManager::GetInstance().GetLatestErrorMessage();

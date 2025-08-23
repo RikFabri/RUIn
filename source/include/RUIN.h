@@ -63,6 +63,8 @@ API void RUIN_CursorMoved(int cursorX, int cursorY);
 API void RUIN_CursorUp(int cursorX, int cursorY);
 API void RUIN_CursorDown(int cursorX, int cursorY);
 
+API void RUIN_RegisterNamedCallback(const char* name, void(*func)(void));
+
 // Returns string containing the most recent error reported.
 API const char* RUIN_GetError();
 
