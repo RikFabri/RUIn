@@ -5,7 +5,7 @@
 #include <string>
 
 #define Create_widget_initializer(WidgetClassName) typedef WidgetClassName _WidgetType;
-#define Bind_member_to_XML(member, xmlElement, attributeName) _DataBindingDescriptor.InitializeMember(offsetof(_WidgetType, member), member, xmlElement, attributeName)
+#define Bind_member_to_XML(member, xmlElement, attributeName) _DataBindingDescriptor.InitializeMember(offsetof(_WidgetType, member), member, xmlElement, attributeName, this)
 #define Bind_method_to_XML(method, xmlElement, attributeName) _DataBindingDescriptor.InitializeMethod(&ConvertMemberToGenericFreeFunction<_WidgetType, &_WidgetType::##method>, xmlElement, attributeName, this)
 #define OnChange(changeHandlerMemberFunction) Then(&ConvertMemberToGenericFreeFunction<_WidgetType, &_WidgetType::##changeHandlerMemberFunction>, this)
 
@@ -36,7 +36,6 @@ namespace RUIN
 
 	private:
 		XMLBindingCreationHelper* m_pInitializer;
-		void(*func)(void*);
 	};
 
 
@@ -45,26 +44,29 @@ namespace RUIN
 	public:
 		void InitializeMethod(void(*method)(void*, const char*), tinyxml2::XMLElement* element, const char* attribute, void* instance);
 
-		ChangeHandlerHelper InitializeMember(size_t memberOffset, std::string& str, tinyxml2::XMLElement* element, const char* attribute);
+		ChangeHandlerHelper InitializeMember(size_t memberOffset, std::string& str, tinyxml2::XMLElement* element, const char* attribute, void* instance);
 
 		// Explicitly listing supported types so people don't need to sift through template errors.
-		ChangeHandlerHelper InitializeMember(size_t memberOffset, float& member, tinyxml2::XMLElement* element, const char* attribute);
-		ChangeHandlerHelper InitializeMember(size_t memberOffset, int& member, tinyxml2::XMLElement* element, const char* attribute);
+		ChangeHandlerHelper InitializeMember(size_t memberOffset, float& member, tinyxml2::XMLElement* element, const char* attribute, void* instance);
+		ChangeHandlerHelper InitializeMember(size_t memberOffset, int& member, tinyxml2::XMLElement* element, const char* attribute, void* instance);
 
 	private:
 		friend class ChangeHandlerHelper;
 
 		template<typename MemberType>
-		void InitializeMemberGeneric(size_t memberOffset, MemberType& member, tinyxml2::XMLElement* element, const char* attribute);
+		void InitializeMemberGeneric(size_t memberOffset, MemberType& member, tinyxml2::XMLElement* element, const char* attribute, void* instance);
+
+		static void AddBinding(void* pInstance, size_t typeHash, size_t memberOffset, const std::string& bindingName);
 
 		std::string ParseBinding(std::string& value, bool& isBinding);
 
-		std::unordered_map<std::string, size_t> m_OffsetsByName;
+		std::string m_CurrentBindingName;
+		bool m_IsCurrentMemberBound;
 	};
 
 
 	template<typename MemberType>
-	inline void XMLBindingCreationHelper::InitializeMemberGeneric(size_t memberOffset, MemberType& member, tinyxml2::XMLElement* element, const char* attribute)
+	inline void XMLBindingCreationHelper::InitializeMemberGeneric(size_t memberOffset, MemberType& member, tinyxml2::XMLElement* element, const char* attribute, void* instance)
 	{
 		const auto* attrib = element->FindAttribute(attribute);
 		if (!attrib)
@@ -74,10 +76,12 @@ namespace RUIN
 
 		bool isBinding;
 		const auto bindingName = ParseBinding(val, isBinding);
+		m_CurrentBindingName = bindingName;
+		m_IsCurrentMemberBound = isBinding;
 
 		if (isBinding)
 		{
-			m_OffsetsByName[bindingName] = memberOffset;
+			AddBinding(instance, typeid(member).hash_code(), memberOffset, bindingName);
 		}
 		else
 		{

@@ -4,6 +4,8 @@
 #include "include/RUIN.h"
 #include "include/Commands.h"
 
+#include "BindingDatabase.h"
+
 #include <string>
 #include <unordered_map>
 #include <functional>
@@ -22,6 +24,7 @@ namespace RUIN
 
 		void* GetClientData() const;
 		void GetDimensions(uint32_t& width, uint32_t& height) const;
+		void Draw(const RenderArea& ra) const;
 	private:
 
 		void* m_pClientData;
@@ -42,6 +45,8 @@ namespace RUIN
 
 		void RegisterNamedCallback(const std::string& name, std::function<void()> func);
 		void InvokeNamedCallback(const std::string& name) const;
+
+		BindingDatabase& GetBindingDatabase();
 
 		void SetCallbacks(const RUIN_Callbacks& cb);
 		void DrawRectangle(const RenderArea& ra, RUIN_Colour colour) const;
@@ -67,6 +72,8 @@ namespace RUIN
 		void RegisterBuiltInWidgetFactories();
 
 		Window m_Window;
+
+		BindingDatabase m_BindingDatabase;
 
 		RUIN_Callbacks m_Callbacks;
 

@@ -49,7 +49,7 @@ source_group("math" FILES ${MATH_SOURCES})
 source_group("utils" FILES ${UTIL_SOURCES})
 source_group("external\\tinyxml" FILES ${TINYXML_SOURCES})
 
-add_library(RUIn SHARED source/RUIN.cpp source/UIManager.cpp 
+add_library(RUIn SHARED source/RUIN.cpp source/UIManager.cpp source/BindingDatabase.cpp
     ${WIDGET_SOURCES}
     ${BINDING_SOURCES}
     ${LAYOUTING_SOURCES}

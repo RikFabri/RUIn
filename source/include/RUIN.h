@@ -63,6 +63,10 @@ API void RUIN_CursorMoved(int cursorX, int cursorY);
 API void RUIN_CursorUp(int cursorX, int cursorY);
 API void RUIN_CursorDown(int cursorX, int cursorY);
 
+API void RUIN_SetBindValuei(const char* bindingName, int value);
+API void RUIN_SetBindValuef(const char* bindingName, float value);
+API void RUIN_SetBindValues(const char* bindingName, const char* value);
+
 API void RUIN_RegisterNamedCallback(const char* name, void(*func)(void));
 
 // Returns string containing the most recent error reported.

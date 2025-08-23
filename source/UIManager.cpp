@@ -4,6 +4,7 @@
 #include "widgets/VerticalBox.h"
 #include "widgets/Label.h"
 #include "widgets/Button.h"
+#include "widgets/Slider.h"
 
 #include <format>
 
@@ -28,6 +29,7 @@ void RUIN::UIManager::RegisterBuiltInWidgetFactories()
 	m_WidgetFactories["VerticalBox"] = [](tinyxml2::XMLElement* pElement) { return new VerticalBox(pElement); };
 	m_WidgetFactories["Label"] = [](tinyxml2::XMLElement* pElement) { return new Label(pElement); };
 	m_WidgetFactories["Button"] = [](tinyxml2::XMLElement* pElement) { return new Button(pElement); };
+	m_WidgetFactories["Slider"] = [](tinyxml2::XMLElement* pElement) { return new Slider(pElement); };
 }
 
 bool RUIN::UIManager::LoadXML(const std::string& path)
@@ -88,6 +90,11 @@ void RUIN::UIManager::InvokeNamedCallback(const std::string& name) const
 	RASSERT(m_NamedUserCallbacks.contains(name), std::format("Named callback {} wasn't registered!", name).c_str());
 
 	m_NamedUserCallbacks.at(name)();
+}
+
+RUIN::BindingDatabase& RUIN::UIManager::GetBindingDatabase()
+{
+	return m_BindingDatabase;
 }
 
 void RUIN::UIManager::SetCallbacks(const RUIN_Callbacks& cb)
@@ -192,4 +199,9 @@ void* RUIN::ClientTexture::GetClientData() const
 void RUIN::ClientTexture::GetDimensions(uint32_t& width, uint32_t& height) const
 {
 	UIManager::GetInstance().QueryTextureDimensions(*this, width, height);
+}
+
+void RUIN::ClientTexture::Draw(const RenderArea& ra) const
+{
+	UIManager::GetInstance().DrawTexture(*this, ra);
 }

@@ -56,6 +56,21 @@ void RUIN_CursorDown(int cursorX, int cursorY)
     UIManager::GetInstance().OnCursorDown(cursorX, cursorY);
 }
 
+void RUIN_SetBindValuei(const char* bindingName, int value)
+{
+    UIManager::GetInstance().GetBindingDatabase().SetDataOnBinding<int>(bindingName, value);
+}
+
+void RUIN_SetBindValuef(const char* bindingName, float value)
+{
+    UIManager::GetInstance().GetBindingDatabase().SetDataOnBinding<float>(bindingName, value);
+}
+
+void RUIN_SetBindValues(const char* bindingName, const char* value)
+{
+    UIManager::GetInstance().GetBindingDatabase().SetDataOnBinding<std::string>(bindingName, value);
+}
+
 void RUIN_RegisterNamedCallback(const char* name, void(*func)(void))
 {
     UIManager::GetInstance().RegisterNamedCallback(name, func);

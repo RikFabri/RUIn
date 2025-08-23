@@ -1,17 +1,22 @@
 #include "DataBinding.h"
+#include "../UIManager.h"
 #include <iostream>
 
 RUIN::ChangeHandlerHelper::ChangeHandlerHelper(XMLBindingCreationHelper* pInitializer)
 	: m_pInitializer(pInitializer)
-	, func(nullptr)
 {
 }
 
 void RUIN::ChangeHandlerHelper::Then(void(*action)(void*), void* initialInstance)
 {
-	// TODO: should be in xml initializer
-	func = action;
 	action(initialInstance);
+
+	if (!m_pInitializer->m_IsCurrentMemberBound)
+	{
+		return;
+	}
+
+	UIManager::GetInstance().GetBindingDatabase().AddChangeHandlerToBinding(m_pInitializer->m_CurrentBindingName, action);
 }
 
 void RUIN::XMLBindingCreationHelper::InitializeMethod(void(*method)(void*, const char*), tinyxml2::XMLElement* element, const char* attribute, void* instance)
@@ -35,7 +40,7 @@ void RUIN::XMLBindingCreationHelper::InitializeMethod(void(*method)(void*, const
 	}
 }
 
-RUIN::ChangeHandlerHelper RUIN::XMLBindingCreationHelper::InitializeMember(size_t memberOffset, std::string& str, tinyxml2::XMLElement* element, const char* attribute)
+RUIN::ChangeHandlerHelper RUIN::XMLBindingCreationHelper::InitializeMember(size_t memberOffset, std::string& str, tinyxml2::XMLElement* element, const char* attribute, void* instance)
 {
 	const char* attribValue = element->Attribute(attribute);
 
@@ -49,24 +54,32 @@ RUIN::ChangeHandlerHelper RUIN::XMLBindingCreationHelper::InitializeMember(size_
 
 	bool isBinding;
 	const auto bindingName = ParseBinding(str, isBinding);
+	m_CurrentBindingName = bindingName;
+	m_IsCurrentMemberBound = isBinding;
+
 	if (isBinding)
 	{
-		m_OffsetsByName[bindingName] = memberOffset;
+		AddBinding(instance, typeid(str).hash_code(), memberOffset, bindingName);
 	}
 
 	return ChangeHandlerHelper{ this };
 }
 
-RUIN::ChangeHandlerHelper RUIN::XMLBindingCreationHelper::InitializeMember(size_t memberOffset, float& member, tinyxml2::XMLElement* element, const char* attribute)
+RUIN::ChangeHandlerHelper RUIN::XMLBindingCreationHelper::InitializeMember(size_t memberOffset, float& member, tinyxml2::XMLElement* element, const char* attribute, void* instance)
 {
-	InitializeMemberGeneric<float>(memberOffset, member, element, attribute);
+	InitializeMemberGeneric<float>(memberOffset, member, element, attribute, instance);
 	return ChangeHandlerHelper{ this };
 }
 
-RUIN::ChangeHandlerHelper RUIN::XMLBindingCreationHelper::InitializeMember(size_t memberOffset, int& member, tinyxml2::XMLElement* element, const char* attribute)
+RUIN::ChangeHandlerHelper RUIN::XMLBindingCreationHelper::InitializeMember(size_t memberOffset, int& member, tinyxml2::XMLElement* element, const char* attribute, void* instance)
 {
-	InitializeMemberGeneric<int>(memberOffset, member, element, attribute);
+	InitializeMemberGeneric<int>(memberOffset, member, element, attribute, instance);
 	return ChangeHandlerHelper{ this };
+}
+
+void RUIN::XMLBindingCreationHelper::AddBinding(void* pInstance, size_t typeHash, size_t memberOffset, const std::string& bindingName)
+{
+	UIManager::GetInstance().GetBindingDatabase().CreateBinding(bindingName, pInstance, typeHash, memberOffset);
 }
 
 std::string RUIN::XMLBindingCreationHelper::ParseBinding(std::string& value, bool& isBinding)
