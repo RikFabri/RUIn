@@ -4,10 +4,13 @@
 #include <unordered_map>
 #include <string>
 
-#define Create_widget_initializer(WidgetClassName) typedef WidgetClassName _WidgetType;
-#define Bind_member_to_XML(member, xmlElement, attributeName) _DataBindingDescriptor.InitializeMember(offsetof(_WidgetType, member), member, xmlElement, attributeName, this)
-#define Bind_method_to_XML(method, xmlElement, attributeName) _DataBindingDescriptor.InitializeMethod(&ConvertMemberToGenericFreeFunction<_WidgetType, &_WidgetType::##method>, xmlElement, attributeName, this)
-#define OnChange(changeHandlerMemberFunction) Then(&ConvertMemberToGenericFreeFunction<_WidgetType, &_WidgetType::##changeHandlerMemberFunction>, this)
+#define TYPE_OF_THIS std::remove_pointer_t<decltype(this)>
+#define Bind_member_to_XML(member, xmlElement, attributeName) _DataBindingDescriptor.InitializeMember(offsetof(TYPE_OF_THIS, member), member, xmlElement, attributeName, this)
+#define Bind_method_to_XML(method, xmlElement, attributeName) _DataBindingDescriptor.InitializeMethod(&ConvertMemberToGenericFreeFunction<TYPE_OF_THIS, &TYPE_OF_THIS::##method>, xmlElement, attributeName, this)
+#define OnChange(changeHandlerMemberFunction) Then(&ConvertMemberToGenericFreeFunction<TYPE_OF_THIS, &TYPE_OF_THIS::##changeHandlerMemberFunction>, this)
+
+#define Notify_member_changed(member) UIManager::GetInstance().GetBindingDatabase().NotifyBindingChanged(this, offsetof(TYPE_OF_THIS, member), member);
+
 
 
 namespace RUIN

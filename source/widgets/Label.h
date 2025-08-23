@@ -13,7 +13,6 @@ namespace RUIN
 		Label(tinyxml2::XMLElement* element);
 
 		void Render(const RenderArea& targetArea) override;
-
 	private:
 		void OnTextChanged();
 		Erm::vec2f GetDimensions() override;

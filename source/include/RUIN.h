@@ -51,21 +51,29 @@ typedef enum RUIN_Result
     RUIN_Success = 1
 } RUIN_Result;
 
+// (De)Initialization
 API RUIN_Result RUIN_InitializeCallbacks(const RUIN_Callbacks* callbacks);
 API void RUIN_Shutdown();
 
+// Frame
 API void RUIN_UpdateUI();
 API void RUIN_RenderUI();
 
 API RUIN_Result RUIN_LoadUIFromXML(const char* path);
 
+// Event handling
 API void RUIN_CursorMoved(int cursorX, int cursorY);
 API void RUIN_CursorUp(int cursorX, int cursorY);
 API void RUIN_CursorDown(int cursorX, int cursorY);
 
+// Data binding
 API void RUIN_SetBindValuei(const char* bindingName, int value);
 API void RUIN_SetBindValuef(const char* bindingName, float value);
 API void RUIN_SetBindValues(const char* bindingName, const char* value);
+
+API void RUIN_BindValuei(const char* bindingName, void(*onChanged)(int));
+API void RUIN_BindValuef(const char* bindingName, void(*onChanged)(float));
+API void RUIN_BindValues(const char* bindingName, void(*onChanged)(const char*));
 
 API void RUIN_RegisterNamedCallback(const char* name, void(*func)(void));
 

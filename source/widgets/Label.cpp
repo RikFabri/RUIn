@@ -6,8 +6,6 @@
 RUIN::Label::Label(tinyxml2::XMLElement* element)
 	: LeafNode(element)
 {
-	Create_widget_initializer(Label);
-	
 	Bind_member_to_XML(m_Text, element, "Text").OnChange(OnTextChanged);
 }
 

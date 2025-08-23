@@ -4,7 +4,6 @@
 RUIN::LeafNode::LeafNode(tinyxml2::XMLElement* e)
 	: IRenderable()
 {
-	Create_widget_initializer(LeafNode);
 	Bind_method_to_XML(InitializeHorizontalFillmode, e, "horizontal-fillMode");
 	Bind_method_to_XML(InitializeVerticalFillmode, e, "vertical-fillMode");
 

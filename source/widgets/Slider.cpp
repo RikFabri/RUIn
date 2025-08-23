@@ -7,8 +7,6 @@
 RUIN::Slider::Slider(tinyxml2::XMLElement* element)
 	: LeafNode(element)
 {
-	Create_widget_initializer(Slider);
-
 	Bind_member_to_XML(m_Value, element, "value").OnChange(OnTextChanged);
 
 	Bind_member_to_XML(m_MinValue, element, "minValue");
@@ -55,6 +53,8 @@ bool RUIN::Slider::HandleMouseMoved(int cursorX, int cursorY)
 	const auto offset = cursorX - m_StartPos.x;
 	m_Value = OffsetToValue(offset);
 	OnTextChanged();
+
+	Notify_member_changed(m_Value);
 
 	return true;
 }

@@ -59,7 +59,7 @@ RUIN::ChangeHandlerHelper RUIN::XMLBindingCreationHelper::InitializeMember(size_
 
 	if (isBinding)
 	{
-		AddBinding(instance, typeid(str).hash_code(), memberOffset, bindingName);
+		AddBinding(instance, typeid(std::string).hash_code(), memberOffset, bindingName);
 	}
 
 	return ChangeHandlerHelper{ this };

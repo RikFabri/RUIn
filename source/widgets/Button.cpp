@@ -6,8 +6,6 @@
 RUIN::Button::Button(tinyxml2::XMLElement* element)
 	: UIContainer(element)
 {
-	Create_widget_initializer(Button);
-
 	Bind_member_to_XML(m_OnClick, element, "onclick");
 }
 
