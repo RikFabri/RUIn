@@ -158,7 +158,7 @@ void RUIN::UIContainer::ClearWidgets()
 	m_RenderAreaPerRenderable.clear();
 }
 
-bool RUIN::UIContainer::HandleMouseMoved(int cursorX, int cursorY)
+bool RUIN::UIContainer::HandleMouseEventGeneric(int cursorX, int cursorY, std::function<bool(IRenderable*, int, int)> func)
 {
 	int count = 0;
 	for (auto& renderable : m_Renderables)
@@ -172,7 +172,7 @@ bool RUIN::UIContainer::HandleMouseMoved(int cursorX, int cursorY)
 
 		if (renderArea.ContainsPoint(cursorX, cursorY))
 		{
-			const bool handled = renderable->HandleMouseMoved(cursorX, cursorY);
+			const bool handled = func(renderable.get(), cursorX, cursorY);
 			if (handled)
 			{
 				return true;
@@ -182,4 +182,19 @@ bool RUIN::UIContainer::HandleMouseMoved(int cursorX, int cursorY)
 	}
 
 	return false;
+}
+
+bool RUIN::UIContainer::HandleMouseMoved(int cursorX, int cursorY)
+{
+	return HandleMouseEventGeneric(cursorX, cursorY, [](IRenderable* obj, int x, int y) -> bool { return obj->HandleMouseMoved(x, y); });
+}
+
+bool RUIN::UIContainer::HandleMouseDown(int cursorX, int cursorY)
+{
+	return HandleMouseEventGeneric(cursorX, cursorY, [](IRenderable* obj, int x, int y) -> bool { return obj->HandleMouseDown(x, y); });
+}
+
+bool RUIN::UIContainer::HandleMouseUp(int cursorX, int cursorY)
+{
+	return HandleMouseEventGeneric(cursorX, cursorY, [](IRenderable* obj, int x, int y) -> bool { return obj->HandleMouseUp(x, y); });
 }

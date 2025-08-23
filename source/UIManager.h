@@ -37,6 +37,8 @@ namespace RUIN
 
 		// Input events
 		void OnCursorMoved(int cursorX, int cursorY);
+		void OnCursorDown(int cursorX, int cursorY);
+		void OnCursorUp(int cursorX, int cursorY);
 
 		void SetCallbacks(const RUIN_Callbacks& cb);
 		void DrawRectangle(const RenderArea& ra, RUIN_Colour colour) const;

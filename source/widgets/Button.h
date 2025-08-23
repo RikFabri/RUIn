@@ -17,8 +17,17 @@ namespace RUIN
 
 		RenderArea GetAreaForChild(const RenderArea& availableArea, RenderArea& usedArea, RenderContext& ctx) const override;
 		bool HandleMouseMoved(int cursorX, int cursorY) override;
+		bool HandleMouseDown(int cursorX, int cursorY) override;
+		bool HandleMouseUp(int cursorX, int cursorY) override;
 
-		bool hovered = false;
+		enum class ButtonState
+		{
+			Default,
+			Hovered,
+			Down,
+		};
+		
+		ButtonState m_ButtonState = ButtonState::Default;
 	};
 
 }

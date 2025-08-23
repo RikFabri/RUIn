@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <memory>
+#include <functional>
 
 #include "Renderable.h"
 #include "tinyxml2.h"
@@ -33,7 +34,12 @@ namespace RUIN
 
 		void Render(const RenderArea& targetArea) override;
 		RenderArea CalculateUsedContentArea(const RenderArea& availableArea) override;
+
+
 		bool HandleMouseMoved(int cursorX, int cursorY) override;
+		bool HandleMouseDown(int cursorX, int cursorY) override;
+		bool HandleMouseUp(int cursorX, int cursorY) override;
+		
 
 		void AddChildWidget(tinyxml2::XMLElement* element);
 
@@ -50,6 +56,8 @@ namespace RUIN
 
 	private:
 		virtual RenderArea GetAreaForChild(const RenderArea& availableArea, RenderArea& usedArea, RenderContext& ctx) const = 0;
+
+		bool HandleMouseEventGeneric(int cursorX, int cursorY, std::function<bool(IRenderable*, int, int)> func);
 
 
 		AlignHelper m_AlignHelper;

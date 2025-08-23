@@ -46,6 +46,16 @@ void RUIN_CursorMoved(int cursorX, int cursorY)
     UIManager::GetInstance().OnCursorMoved(cursorX, cursorY);
 }
 
+void RUIN_CursorUp(int cursorX, int cursorY)
+{
+    UIManager::GetInstance().OnCursorUp(cursorX, cursorY);
+}
+
+void RUIN_CursorDown(int cursorX, int cursorY)
+{
+    UIManager::GetInstance().OnCursorDown(cursorX, cursorY);
+}
+
 const char* RUIN_GetError()
 {
     return UIManager::GetInstance().GetLatestErrorMessage();

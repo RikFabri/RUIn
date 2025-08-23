@@ -4,3 +4,13 @@ bool RUIN::IRenderable::HandleMouseMoved(int cursorX, int cursorY)
 {
 	return false;
 }
+
+bool RUIN::IRenderable::HandleMouseDown(int cursorX, int cursorY)
+{
+	return false;
+}
+
+bool RUIN::IRenderable::HandleMouseUp(int cursorX, int cursorY)
+{
+	return false;
+}

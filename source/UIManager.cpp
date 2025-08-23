@@ -66,6 +66,16 @@ void RUIN::UIManager::OnCursorMoved(int cursorX, int cursorY)
 	m_Window.HandleMouseMoved(cursorX, cursorY);
 }
 
+void RUIN::UIManager::OnCursorDown(int cursorX, int cursorY)
+{
+	m_Window.HandleMouseDown(cursorX, cursorY);
+}
+
+void RUIN::UIManager::OnCursorUp(int cursorX, int cursorY)
+{
+	m_Window.HandleMouseUp(cursorX, cursorY);
+}
+
 void RUIN::UIManager::SetCallbacks(const RUIN_Callbacks& cb)
 {
 	m_Callbacks = cb;

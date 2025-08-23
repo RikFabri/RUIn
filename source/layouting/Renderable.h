@@ -17,6 +17,8 @@ namespace RUIN
 
 		// // Input events. Return true if you handled the input, false to let them propagate.
 		virtual bool HandleMouseMoved(int cursorX, int cursorY);
+		virtual bool HandleMouseDown(int cursorX, int cursorY);
+		virtual bool HandleMouseUp(int cursorX, int cursorY);
 
 	protected:
 		// TODO: Can we have this in a refcounted store, with entities referencing those? Rather than having copies themselves?
