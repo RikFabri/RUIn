@@ -3,6 +3,7 @@
 #include "widgets/Window.h"
 #include "include/RUIN.h"
 #include "include/Commands.h"
+#include "resources/ClientData.h"
 
 #include "BindingDatabase.h"
 
@@ -12,24 +13,6 @@
 
 namespace RUIN
 {
-	class ClientTexture
-	{
-	public:
-		~ClientTexture();
-		ClientTexture();
-		ClientTexture(void* pClientData);
-		ClientTexture(ClientTexture&& other) noexcept;
-		ClientTexture(const ClientTexture& other) = delete;
-		ClientTexture& operator=(ClientTexture&& other) noexcept;
-
-		void* GetClientData() const;
-		void GetDimensions(uint32_t& width, uint32_t& height) const;
-		void Draw(const RenderArea& ra) const;
-	private:
-
-		void* m_pClientData;
-	};
-
 	class UIManager final : public Singleton<UIManager>
 	{
 	public:

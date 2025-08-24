@@ -5,38 +5,49 @@
 #include <typeinfo>
 #include <functional>
 
-
 namespace RUIN
 {
 	class BindingDatabase
 	{
+#pragma region DatabaseNodes
 	public:
-		template<typename BoundDataType>
-		void SetDataOnBinding(const std::string& bindingName, BoundDataType data);
-
-		template<typename BoundDataType>
-		void ObserveBinding(const std::string& bindingName, std::function<void(BoundDataType)> observer);
+		enum class BindingType
+		{
+			POD,
+			STR
+		};
+	private:
 
 		using BindingChangeHandler = std::function<void(void*)>;
 
-		void CreateBinding(const std::string& bindingName, void* pInstance, size_t typeHash, size_t memberOffset);
-		void AddChangeHandlerToBinding(const std::string& bindingName, BindingChangeHandler func);
-
-		template<typename BoundDataType>
-		void NotifyBindingChanged(void* pInstance, size_t offset, BoundDataType newValue);
-
-	private:
-		template<typename BoundDataType>
-		void NotifyBindingChangeInternal(const std::string& bindingName, BoundDataType newValue);
-
 		struct BindingData
 		{
-			void* pInstance = nullptr;
+			BindingType type;
 			size_t typeHash;
 			size_t offset;
+			size_t typeSize;
+			void* pInstance = nullptr;
 			BindingChangeHandler changeHandler = nullptr;
 
 			std::vector<std::function<void(void*)>> observers;
+		};
+
+		struct BindingContext
+		{
+			std::vector<std::string> m_BindingNames;
+		};
+
+		struct WidgetId
+		{
+			void* pInstance = nullptr;
+			unsigned bindingContextId;
+
+			bool operator==(const WidgetId& other) const;
+		};
+
+		struct BindingContextLookupKeyHasher
+		{
+			size_t operator()(const WidgetId& key) const noexcept;
 		};
 
 		struct ReverseLookupKey
@@ -47,42 +58,103 @@ namespace RUIN
 			bool operator==(const ReverseLookupKey& other) const;
 		};
 
-		struct Hasher
+		struct ReverseLookupKeyHasher
 		{
 			size_t operator()(const ReverseLookupKey& key) const noexcept;
 		};
 
-		std::unordered_map<std::string, BindingData> m_Bindings;
-		std::unordered_map<ReverseLookupKey, std::string, Hasher> m_BindingNames;
+		struct BindingIdentifier
+		{
+			std::string bindingName;
+			unsigned bindingContextId;
+
+			bool operator==(const BindingIdentifier& other) const;
+		};
+
+		struct BindingIdentifierHasher
+		{
+			size_t operator()(const BindingIdentifier& key) const noexcept;
+		};
+#pragma endregion
+
+	public:
+
+		// Returns new context id
+		unsigned PushNewContext();
+		void PopContext();
+
+		template<typename BoundDataType>
+		void SetDataOnBinding(const std::string& bindingName, BoundDataType data, unsigned bindingContextId = 0);
+
+		// Returns the amount of bytes read from pData
+		size_t SetDataOnBinding(const std::string& bindingName, void* pData, unsigned bindingContextId = 0, bool rawInputStrings = false);
+
+		size_t PatchWidgetDataFromBuffer(void* buffer, int bufferSize, void* instance, unsigned bindingContextId);
+
+		template<typename BoundDataType>
+		void ObserveBinding(const std::string& bindingName, std::function<void(BoundDataType)> observer, unsigned bindingContextId = 0);
+
+
+		void CreateBinding(const std::string& bindingName, void* pInstance, size_t typeHash, size_t memberOffset, size_t memberSize, BindingType type);
+		void AddChangeHandlerToBinding(const std::string& bindingName, BindingChangeHandler func);
+
+		template<typename BoundDataType>
+		void NotifyBindingChanged(void* pInstance, size_t offset, BoundDataType newValue);
+
+
+	private:
+		template<typename BoundDataType>
+		void NotifyBindingChangeInternal(const BindingIdentifier& bindingId, BoundDataType newValue);
+
+
+		//struct TypeBindingDescriptor
+		//{
+		//	struct NamedOffset
+		//	{
+		//		std::string m_MemberName;
+		//		size_t m_MemberOffset;
+
+		//		bool operator==(const NamedOffset& other);
+		//	};
+
+		//	std::vector<NamedOffset> m_Offsets;
+		//};
+
+
+		// TODO: this whole thing needs some proper memory management. Small C++ generic database implementation for later?
+		std::unordered_map<BindingIdentifier, BindingData, BindingIdentifierHasher> m_Bindings;
+		std::unordered_map<ReverseLookupKey, BindingIdentifier, ReverseLookupKeyHasher> m_BindingNames;
+		std::unordered_map<WidgetId, BindingContext, BindingContextLookupKeyHasher> m_WidgetBindingNames;
+
+		unsigned m_CurrentContext = 0;
+		unsigned m_NumContexts = 0;
+
+		BindingIdentifier GetCurrentBindingIdentifier(const std::string& bindingName) const;
+
+		//std::unordered_map<size_t, TypeBindingDescriptor> m_DescriptorPerType;
 	};
 
 
 	template<typename BoundDataType>
-	inline void BindingDatabase::SetDataOnBinding(const std::string& bindingName, BoundDataType data)
+	inline void BindingDatabase::SetDataOnBinding(const std::string& bindingName, BoundDataType data, unsigned bindingContextId)
 	{
-		RASSERT(m_Bindings.contains(bindingName), "Could not find matching binding!");
+		BindingIdentifier bindingId{ bindingName, bindingContextId };
+		RASSERT(m_Bindings.contains(bindingId), "Could not find matching binding!");
 
-		const auto& bindingData = m_Bindings.at(bindingName);
+		const auto& bindingData = m_Bindings.at(bindingId);
 
 		RASSERT(typeid(data).hash_code() == bindingData.typeHash, "The binding expects a different type of data!");
 
-		char* basePtr = static_cast<char*>(bindingData.pInstance);
-		
-		auto* pMember = reinterpret_cast<BoundDataType*>(basePtr + bindingData.offset);
-		*pMember = std::move(data);
-
-		if (bindingData.changeHandler)
-		{
-			bindingData.changeHandler(bindingData.pInstance);
-		}
+		SetDataOnBinding(bindingName, (void*) & data, bindingContextId);
 	}
 
 	template<typename BoundDataType>
-	inline void BindingDatabase::ObserveBinding(const std::string& bindingName, std::function<void(BoundDataType)> observer)
+	inline void BindingDatabase::ObserveBinding(const std::string& bindingName, std::function<void(BoundDataType)> observer, unsigned bindingContextId)
 	{
-		RASSERT(m_Bindings.contains(bindingName), "Could not find matching binding!");
+		BindingIdentifier bindingId{ bindingName, bindingContextId };
+		RASSERT(m_Bindings.contains(bindingId), "Could not find matching binding!");
 
-		auto& bindingData = m_Bindings.at(bindingName);
+		auto& bindingData = m_Bindings.at(bindingId);
 
 		RASSERT(typeid(BoundDataType).hash_code() == bindingData.typeHash, "The binding expects a different type of data!");
 
@@ -107,11 +179,11 @@ namespace RUIN
 	}
 
 	template<typename BoundDataType>
-	inline void BindingDatabase::NotifyBindingChangeInternal(const std::string& bindingName, BoundDataType newValue)
+	inline void BindingDatabase::NotifyBindingChangeInternal(const BindingIdentifier& bindingId, BoundDataType newValue)
 	{
-		RASSERT(m_Bindings.contains(bindingName), "Could not find matching binding!");
+		RASSERT(m_Bindings.contains(bindingId), "Could not find matching binding!");
 
-		auto& bindingData = m_Bindings.at(bindingName);
+		auto& bindingData = m_Bindings.at(bindingId);
 
 		RASSERT(typeid(BoundDataType).hash_code() == bindingData.typeHash, "The binding expects a different type of data!");
 

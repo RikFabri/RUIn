@@ -3,6 +3,7 @@
 #include <memory>
 #include <functional>
 
+#include "../resources/ClientData.h"
 #include "Renderable.h"
 #include "tinyxml2.h"
 #include "MathLib.h"
@@ -58,12 +59,19 @@ namespace RUIN
 		virtual RenderArea GetAreaForChild(const RenderArea& availableArea, RenderArea& usedArea, RenderContext& ctx) const = 0;
 
 		bool HandleMouseEventGeneric(int cursorX, int cursorY, std::function<bool(IRenderable*, int, int)> func);
+		void DataSourceChanged();
 
+		void InstantiateItemTemplate();
 
 		AlignHelper m_AlignHelper;
 
 		std::vector<std::unique_ptr<IRenderable>> m_Renderables;
 		std::vector<RenderArea> m_RenderAreaPerRenderable;
+
+		std::vector<unsigned> m_ContextIdPerInstantiatedTemplate;
+
+		ClientBuffer m_DataSource;
+		std::string m_ItemTemplate;
 	};
 
 }

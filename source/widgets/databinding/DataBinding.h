@@ -1,8 +1,12 @@
 #pragma once
+#include "../../resources/ClientData.h"
+#include "../BindingDatabase.h"
 #include "tinyxml2.h"
+#include "debug.h"
 
 #include <unordered_map>
 #include <string>
+#include <format>
 
 #define TYPE_OF_THIS std::remove_pointer_t<decltype(this)>
 #define Bind_member_to_XML(member, xmlElement, attributeName) _DataBindingDescriptor.InitializeMember(offsetof(TYPE_OF_THIS, member), member, xmlElement, attributeName, this)
@@ -48,6 +52,7 @@ namespace RUIN
 		void InitializeMethod(void(*method)(void*, const char*), tinyxml2::XMLElement* element, const char* attribute, void* instance);
 
 		ChangeHandlerHelper InitializeMember(size_t memberOffset, std::string& str, tinyxml2::XMLElement* element, const char* attribute, void* instance);
+		ChangeHandlerHelper InitializeMember(size_t memberOffset, ClientBuffer& member, tinyxml2::XMLElement* element, const char* attribute, void* instance);
 
 		// Explicitly listing supported types so people don't need to sift through template errors.
 		ChangeHandlerHelper InitializeMember(size_t memberOffset, float& member, tinyxml2::XMLElement* element, const char* attribute, void* instance);
@@ -59,7 +64,7 @@ namespace RUIN
 		template<typename MemberType>
 		void InitializeMemberGeneric(size_t memberOffset, MemberType& member, tinyxml2::XMLElement* element, const char* attribute, void* instance);
 
-		static void AddBinding(void* pInstance, size_t typeHash, size_t memberOffset, const std::string& bindingName);
+		static void AddBinding(void* pInstance, size_t typeHash, size_t memberOffset, size_t memberSize, const std::string& bindingName, const std::string& attribute, BindingDatabase::BindingType type);
 
 		std::string ParseBinding(std::string& value, bool& isBinding);
 
@@ -71,6 +76,7 @@ namespace RUIN
 	template<typename MemberType>
 	inline void XMLBindingCreationHelper::InitializeMemberGeneric(size_t memberOffset, MemberType& member, tinyxml2::XMLElement* element, const char* attribute, void* instance)
 	{
+		m_IsCurrentMemberBound = false;
 		const auto* attrib = element->FindAttribute(attribute);
 		if (!attrib)
 			return;
@@ -84,11 +90,24 @@ namespace RUIN
 
 		if (isBinding)
 		{
-			AddBinding(instance, typeid(member).hash_code(), memberOffset, bindingName);
+			BindingDatabase::BindingType type = BindingDatabase::BindingType::POD;
+			
+			if (typeid(MemberType) == typeid(std::string))
+			{
+				type = BindingDatabase::BindingType::STR;
+			}
+
+			AddBinding(instance, typeid(member).hash_code(), memberOffset, sizeof(MemberType), bindingName, attribute, type);
 		}
 		else
 		{
-			element->QueryAttribute(attribute, &member);
+			if constexpr (std::is_pod_v<MemberType>) {
+				element->QueryAttribute(attribute, &member);
+			}
+			else
+			{
+				RASSERT(false, std::format("{} Is not supported without binding!", attribute).c_str());
+			}
 		}
 	}
 }

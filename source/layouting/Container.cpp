@@ -1,8 +1,10 @@
 #include "Container.h"
 #include <cassert>
 
+#include "../widgets/databinding/DataBinding.h"
 #include "../widgets/Label.h"
 #include "../UIManager.h"
+
 
 RUIN::AlignHelper::AlignHelper(tinyxml2::XMLElement* e)
 {
@@ -80,8 +82,24 @@ RUIN::UIContainer::UIContainer(tinyxml2::XMLElement* element)
 		return; 
 	}
 
+	Bind_member_to_XML(m_DataSource, element, "datasource").OnChange(DataSourceChanged);
+
 	for (auto* e = element->FirstChildElement(); e; e = e->NextSiblingElement())
 	{
+		const char* name = e->Name();
+
+		if (strcmp(name, "ItemTemplate") == 0)
+		{
+			RASSERT(m_Renderables.size() == 0, "Can't mix ItemTemplate with normal widgets!");
+
+			tinyxml2::XMLPrinter printer;
+			e->Accept(&printer);
+			m_ItemTemplate = printer.CStr();
+
+			return;
+		}
+
+
 		AddChildWidget(e);
 	}
 }
@@ -182,6 +200,49 @@ bool RUIN::UIContainer::HandleMouseEventGeneric(int cursorX, int cursorY, std::f
 	}
 
 	return false;
+}
+
+void RUIN::UIContainer::DataSourceChanged()
+{
+	// We always assume buffers are valid and contain enough data for all template instantiations.
+	// By that logic, anything over 0 is enough for us to start spawning child widgets
+	if (m_DataSource.GetBufferSize() == 0)
+	{
+		return;
+	}
+
+	InstantiateItemTemplate();
+}
+
+void RUIN::UIContainer::InstantiateItemTemplate()
+{
+	using namespace tinyxml2;
+	XMLDocument doc;
+	const auto result = doc.Parse(m_ItemTemplate.c_str());
+
+	RASSERT(result == XML_SUCCESS, "ItemTemplate was not valid xml!");
+
+	auto* pRoot = doc.RootElement();
+
+	const char* rootElementName = pRoot->Name();
+	RASSERT(strcmp(rootElementName, "ItemTemplate") == 0, "Instantiating item template, but xml doesn't have an itemtemplate root!");
+
+	const auto contextId = UIManager::GetInstance().GetBindingDatabase().PushNewContext();
+	m_ContextIdPerInstantiatedTemplate.emplace_back(contextId);
+
+	size_t dataRead = 0;
+
+	for (auto* e = pRoot->FirstChildElement(); e; e = e->NextSiblingElement())
+	{
+		AddChildWidget(e);
+
+		auto* pWidget = m_Renderables.rbegin()->get();
+		dataRead += UIManager::GetInstance().GetBindingDatabase().PatchWidgetDataFromBuffer(m_DataSource.GetBuffer(dataRead), m_DataSource.GetBufferSize(), pWidget, contextId);
+	}
+
+	UIManager::GetInstance().GetBindingDatabase().PopContext();
+
+
 }
 
 bool RUIN::UIContainer::HandleMouseMoved(int cursorX, int cursorY)
