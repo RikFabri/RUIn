@@ -1,4 +1,5 @@
 #include "LeafNode.h"
+#include "../UIManager.h"
 #include <algorithm>
 
 RUIN::LeafNode::LeafNode(tinyxml2::XMLElement* e)
@@ -62,6 +63,11 @@ RUIN::RenderArea RUIN::LeafNode::CalculateUsedContentArea(const RenderArea& avai
 	// End margins
 
 	return rc;
+}
+
+size_t RUIN::LeafNode::PatchAllDataFromBuffer(void* buffer, unsigned bufferSize, unsigned bindingContextId)
+{
+	return UIManager::GetInstance().GetBindingDatabase().PatchWidgetDataFromBuffer(buffer, bufferSize, this, bindingContextId);
 }
 
 void RUIN::LeafNode::InitializeVerticalFillmode(const char* mode)

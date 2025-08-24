@@ -237,11 +237,11 @@ void RUIN::UIContainer::InstantiateItemTemplate()
 		AddChildWidget(e);
 
 		auto* pWidget = m_Renderables.rbegin()->get();
-		dataRead += UIManager::GetInstance().GetBindingDatabase().PatchWidgetDataFromBuffer(m_DataSource.GetBuffer(dataRead), m_DataSource.GetBufferSize(), pWidget, contextId);
+		dataRead += pWidget->PatchAllDataFromBuffer(m_DataSource.GetBuffer(dataRead), m_DataSource.GetBufferSize(), contextId);
+
 	}
 
 	UIManager::GetInstance().GetBindingDatabase().PopContext();
-
 
 }
 
@@ -258,4 +258,16 @@ bool RUIN::UIContainer::HandleMouseDown(int cursorX, int cursorY)
 bool RUIN::UIContainer::HandleMouseUp(int cursorX, int cursorY)
 {
 	return HandleMouseEventGeneric(cursorX, cursorY, [](IRenderable* obj, int x, int y) -> bool { return obj->HandleMouseUp(x, y); });
+}
+
+size_t RUIN::UIContainer::PatchAllDataFromBuffer(void* buffer, unsigned bufferSize, unsigned bindingContextId)
+{
+	auto dataRead = UIManager::GetInstance().GetBindingDatabase().PatchWidgetDataFromBuffer(buffer, bufferSize, this, bindingContextId);
+
+	for (auto& renderable : m_Renderables)
+	{
+		dataRead += renderable->PatchAllDataFromBuffer((char*)buffer + dataRead, bufferSize - dataRead, bindingContextId);
+	}
+
+	return dataRead;
 }

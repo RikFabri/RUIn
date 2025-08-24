@@ -66,6 +66,12 @@ size_t RUIN::BindingDatabase::SetDataOnBinding(const std::string& bindingName, v
 size_t RUIN::BindingDatabase::PatchWidgetDataFromBuffer(void* buffer, int bufferSize, void* instance, unsigned bindingContextId)
 {
 	WidgetId bindingContextKey{ instance, bindingContextId };
+
+	if (!m_WidgetBindingNames.contains(bindingContextKey))
+	{
+		return 0;
+	}
+
 	const auto& bindingNames = m_WidgetBindingNames.at(bindingContextKey);
 
 	size_t dataRead = 0;

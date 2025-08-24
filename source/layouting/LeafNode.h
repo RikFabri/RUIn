@@ -11,6 +11,8 @@ namespace RUIN
 		LeafNode(tinyxml2::XMLElement* e);
 
 		RenderArea CalculateUsedContentArea(const RenderArea& availableArea) final;
+		size_t PatchAllDataFromBuffer(void* buffer, unsigned bufferSize, unsigned bindingContextId) final;
+
 
 	private:
 		virtual Erm::vec2f GetDimensions() = 0;

@@ -51,6 +51,10 @@ bool RUIN::Button::HandleMouseDown(int cursorX, int cursorY)
 
 bool RUIN::Button::HandleMouseUp(int cursorX, int cursorY)
 {
+	if (m_OnClick.empty())
+		return false;
+
+
 	UIManager::GetInstance().InvokeNamedCallback(m_OnClick);
 
 	m_ButtonState = ButtonState::Default;

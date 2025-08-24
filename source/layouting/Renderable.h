@@ -20,7 +20,9 @@ namespace RUIN
 		virtual bool HandleMouseDown(int cursorX, int cursorY);
 		virtual bool HandleMouseUp(int cursorX, int cursorY);
 
+		virtual size_t PatchAllDataFromBuffer(void* buffer, unsigned bufferSize, unsigned bindingContextId) = 0;
 	protected:
+
 		// TODO: Can we have this in a refcounted store, with entities referencing those? Rather than having copies themselves?
 		// Also, an interface probably shouldn't have any state, but making a base class just for this seems excessive.
 		XMLBindingCreationHelper _DataBindingDescriptor;
