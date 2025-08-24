@@ -210,26 +210,37 @@ void RUIN::UIContainer::DataSourceChanged()
 	// By that logic, anything over 0 is enough for us to start spawning child widgets
 	if (bufferSize == 0)
 	{
+		// TODO: We should probably not clear, but hide widgets. Otherwise we'll clutter our binding databases.
+		// Although, we should probably implement some cleanup functions in the database too.
+		m_Renderables.clear();
 		return;
 	}
 
-
 	size_t dataRead = 0;
-	size_t singleChildSize = 0;
 
-	do
+	// Patch in data for existing widgets first.
+	unsigned count = 0;
+	for (auto& renderable : m_Renderables)
+	{
+		auto bindingContext = m_ContextIdPerInstantiatedTemplate[count++];
+
+		dataRead += renderable->PatchAllDataFromBuffer(m_DataSource.GetBuffer(dataRead), bufferSize - dataRead, bindingContext);
+
+		if (dataRead >= bufferSize)
+		{
+			break;
+		}
+	}
+
+	// Resize in case we had too many.
+	m_Renderables.resize(count);
+
+	// Instantiate remaining ones
+	while (dataRead < bufferSize)
 	{
 		// assign rather than increment, since dataRead is already added from the offset parameter.
 		dataRead = InstantiateItemTemplate(dataRead);
-
-		if (singleChildSize == 0)
-		{
-			// Knowing how much a single instantation costs, 
-			// allows us to ignore the last entries in the buffer if they don't contain enough data for a full widget.
-			singleChildSize = dataRead;
-		}
-
-	} while (dataRead < bufferSize && dataRead + singleChildSize < m_DataSource.GetBufferSize());
+	}
 }
 
 size_t RUIN::UIContainer::InstantiateItemTemplate(size_t sourceStreamOffset)
