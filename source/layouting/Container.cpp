@@ -204,17 +204,35 @@ bool RUIN::UIContainer::HandleMouseEventGeneric(int cursorX, int cursorY, std::f
 
 void RUIN::UIContainer::DataSourceChanged()
 {
+	const auto bufferSize = m_DataSource.GetBufferSize();
+
 	// We always assume buffers are valid and contain enough data for all template instantiations.
 	// By that logic, anything over 0 is enough for us to start spawning child widgets
-	if (m_DataSource.GetBufferSize() == 0)
+	if (bufferSize == 0)
 	{
 		return;
 	}
 
-	InstantiateItemTemplate();
+
+	size_t dataRead = 0;
+	size_t singleChildSize = 0;
+
+	do
+	{
+		// assign rather than increment, since dataRead is already added from the offset parameter.
+		dataRead = InstantiateItemTemplate(dataRead);
+
+		if (singleChildSize == 0)
+		{
+			// Knowing how much a single instantation costs, 
+			// allows us to ignore the last entries in the buffer if they don't contain enough data for a full widget.
+			singleChildSize = dataRead;
+		}
+
+	} while (dataRead < bufferSize && dataRead + singleChildSize < m_DataSource.GetBufferSize());
 }
 
-void RUIN::UIContainer::InstantiateItemTemplate()
+size_t RUIN::UIContainer::InstantiateItemTemplate(size_t sourceStreamOffset)
 {
 	using namespace tinyxml2;
 	XMLDocument doc;
@@ -230,7 +248,7 @@ void RUIN::UIContainer::InstantiateItemTemplate()
 	const auto contextId = UIManager::GetInstance().GetBindingDatabase().PushNewContext();
 	m_ContextIdPerInstantiatedTemplate.emplace_back(contextId);
 
-	size_t dataRead = 0;
+	size_t dataRead = sourceStreamOffset;
 
 	for (auto* e = pRoot->FirstChildElement(); e; e = e->NextSiblingElement())
 	{
@@ -243,6 +261,7 @@ void RUIN::UIContainer::InstantiateItemTemplate()
 
 	UIManager::GetInstance().GetBindingDatabase().PopContext();
 
+	return dataRead;
 }
 
 bool RUIN::UIContainer::HandleMouseMoved(int cursorX, int cursorY)

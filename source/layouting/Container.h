@@ -62,7 +62,7 @@ namespace RUIN
 		bool HandleMouseEventGeneric(int cursorX, int cursorY, std::function<bool(IRenderable*, int, int)> func);
 		void DataSourceChanged();
 
-		void InstantiateItemTemplate();
+		size_t InstantiateItemTemplate(size_t sourceStreamOffset);
 
 		AlignHelper m_AlignHelper;
 

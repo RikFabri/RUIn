@@ -40,7 +40,6 @@ size_t RUIN::BindingDatabase::SetDataOnBinding(const std::string& bindingName, v
 
 		auto* string = static_cast<const char*>(pData);
 		dataRead = strlen(string) + 1;
-		//dataRead = string->length() + 1;
 
 		*pMember = string;
 	}
