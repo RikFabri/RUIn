@@ -8,6 +8,7 @@ namespace DB
 {
 	namespace Helper
 	{
+		// ===== Find type index in tuple =====
 		template<typename T, typename Tuple>
 		struct tuple_index;
 
@@ -22,6 +23,41 @@ namespace DB
 		{
 			static constexpr std::size_t value = 1 + tuple_index<T, std::tuple<Types...>>::value;
 		};
+		// =================================
+
+		// ===== Default hashers supporting pairs =====
+		inline void hash_combine(std::size_t& seed, std::size_t value) {
+			seed ^= value + 0x9e3779b97f4a7c15ull + (seed << 6) + (seed >> 2);
+		}
+		template <typename T1, typename T2>
+		struct HashPair 
+		{
+			std::size_t operator()(const std::pair<T1, T2>& p) const noexcept {
+				std::size_t seed = 0;
+				hash_combine(seed, std::hash<T1>{}(p.first));
+				hash_combine(seed, std::hash<T2>{}(p.second));
+				return seed;
+			}
+		};
+
+		template <typename T, typename = void>
+		struct DefaultHasher;
+
+		template <typename T>
+		struct DefaultHasher < T, std::void_t<decltype(std::hash<T>{}(std::declval<T>())) >>
+		{
+			using type = std::hash<T>;
+		};
+
+		template <typename T1, typename T2>
+		struct DefaultHasher<std::pair<T1, T2>, void>
+		{
+			using type = HashPair<T1, T2>;
+		};
+
+		template <typename T>
+		using DefaultHasher_t = typename DefaultHasher<T>::type;
+		// =================================
 	}
 
 	template<typename Data, typename... Queries>
@@ -79,9 +115,7 @@ namespace DB
 			auto& reverseLookup = std::get<I>(m_ReverseLookups);
 			using Query = std::tuple_element_t<I, std::tuple<Queries...>>;
 
-			const Query query{};
-
-			reverseLookup[query.ReturnKeyFromData(data)].emplace_back(index);
+			reverseLookup[Query::ReturnKeyFromData(data)].emplace_back(index);
 
 			InsertIndices<I + 1>(data, index);
 		}
