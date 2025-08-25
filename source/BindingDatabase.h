@@ -5,6 +5,7 @@
 #include <string>
 #include <typeinfo>
 #include <functional>
+#include <format>
 
 namespace RUIN
 {
@@ -37,26 +38,17 @@ namespace RUIN
 
 		struct QueryByName
 		{
-			using KeyType = std::pair<std::string, unsigned>;
-			using Hasher = DB::Helper::DefaultHasher_t<KeyType>;
-
-			static KeyType ReturnKeyFromData(const BindingData& data) { return { data.bindingName, data.bindingContextId }; }
+			static std::pair<std::string, unsigned> ReturnKeyFromData(const BindingData& data) { return { data.bindingName, data.bindingContextId }; }
 		};
 
 		struct QueryByOffset
 		{
-			using KeyType = std::pair<void*, size_t>;
-			using Hasher = DB::Helper::DefaultHasher_t<KeyType>;
-
-			static KeyType ReturnKeyFromData(const BindingData& data) { return { data.pInstance, data.offset }; }
+			static std::pair<void*, size_t> ReturnKeyFromData(const BindingData& data) { return { data.pInstance, data.offset }; }
 		};
 
 		struct QueryByWidget
 		{
-			using KeyType = std::pair<void*, unsigned>;
-			using Hasher = DB::Helper::DefaultHasher_t<KeyType>;
-
-			static KeyType ReturnKeyFromData(const BindingData& data) { return { data.pInstance, data.bindingContextId }; }
+			static std::pair<void*, unsigned> ReturnKeyFromData(const BindingData& data) { return { data.pInstance, data.bindingContextId }; }
 		};
 #pragma endregion
 

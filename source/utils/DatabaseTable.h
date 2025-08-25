@@ -40,17 +40,14 @@ namespace DB
 			}
 		};
 
-		template <typename T, typename = void>
-		struct DefaultHasher;
-
 		template <typename T>
-		struct DefaultHasher < T, std::void_t<decltype(std::hash<T>{}(std::declval<T>())) >>
+		struct DefaultHasher
 		{
 			using type = std::hash<T>;
 		};
 
 		template <typename T1, typename T2>
-		struct DefaultHasher<std::pair<T1, T2>, void>
+		struct DefaultHasher<std::pair<T1, T2>>
 		{
 			using type = HashPair<T1, T2>;
 		};
@@ -67,14 +64,17 @@ namespace DB
 		void Insert(Data&& data);
 
 		template<typename Query>
-		auto QueryRow(const typename Query::KeyType& key) -> std::vector<Data*>;
+		auto QueryRow(const decltype(Query::ReturnKeyFromData(std::declval<Data>()))& key) -> std::vector<Data*>;
 
 	private:
 		template<std::size_t I = 0>
 		void InsertIndices(const Data& data, size_t index);
 
 		std::vector<Data> m_Data;
-		std::tuple<std::unordered_map<typename Queries::KeyType, std::vector<size_t>, typename Queries::Hasher>...> m_ReverseLookups;
+		std::tuple<std::unordered_map<
+			decltype(Queries::ReturnKeyFromData(std::declval<Data>())),
+			std::vector<size_t>,
+			Helper::DefaultHasher_t<decltype(Queries::ReturnKeyFromData(std::declval<Data>()))>>...> m_ReverseLookups;
 	};
 
 	template<typename Data, typename ...Queries>
@@ -87,7 +87,7 @@ namespace DB
 
 	template<typename Data, typename ...Queries>
 	template<typename Query>
-	inline auto Table<Data, Queries...>::QueryRow(const typename Query::KeyType& key) -> std::vector<Data*>
+	inline auto Table<Data, Queries...>::QueryRow(const decltype(Query::ReturnKeyFromData(std::declval<Data>()))& key) -> std::vector<Data*>
 	{
 		constexpr std::size_t I = Helper::tuple_index<Query, std::tuple<Queries...>>::value;
 		auto& reverseLookup = std::get<I>(m_ReverseLookups);
