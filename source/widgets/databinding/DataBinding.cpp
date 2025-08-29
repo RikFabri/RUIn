@@ -32,7 +32,10 @@ void RUIN::XMLBindingCreationHelper::InitializeMethod(void(*method)(void*, const
 
 	if (isBinding)
 	{
-		std::cout << "binding found for method. Not implemented yet.";
+		// TODO: We should probably union this instead
+		static_assert(sizeof(method) >= sizeof(size_t), "We're reusing the offset field to store method pointers.");
+
+		AddBinding(instance, typeid(std::string).hash_code(), (size_t)method, sizeof(void*), bindingName, attribute, BindingDatabase::BindingType::FUNCTION);
 	}
 	else
 	{

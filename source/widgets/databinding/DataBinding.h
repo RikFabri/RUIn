@@ -14,7 +14,7 @@
 #define OnChange(changeHandlerMemberFunction) Then(&ConvertMemberToGenericFreeFunction<TYPE_OF_THIS, &TYPE_OF_THIS::##changeHandlerMemberFunction>, this)
 
 #define Notify_member_changed(member) UIManager::GetInstance().GetBindingDatabase().NotifyBindingChanged(this, offsetof(TYPE_OF_THIS, member), member);
-
+#define Notify_method_changed(member, data) UIManager::GetInstance().GetBindingDatabase().NotifyBindingChanged(this, (size_t)&member, data);
 
 
 namespace RUIN

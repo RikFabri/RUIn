@@ -16,7 +16,8 @@ namespace RUIN
 		enum class BindingType
 		{
 			POD,
-			STR
+			STR,
+			FUNCTION
 		};
 	private:
 

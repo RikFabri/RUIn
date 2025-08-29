@@ -47,6 +47,20 @@ size_t RUIN::BindingDatabase::SetDataOnBindingInternal(const BindingData& bindin
 
 		*pMember = std::move(*string);
 	}
+	else if (bindingData.type == BindingType::FUNCTION) // This field does not have a backing member
+	{
+		auto* func = reinterpret_cast<void(*)(void*, const char*)>(bindingData.offset);
+
+		if (rawInputStrings)
+		{
+			func(bindingData.pInstance, (const char*)pData);
+		}
+		else
+		{
+			auto* string = static_cast<std::string*>(pData);
+			func(bindingData.pInstance, string->c_str());
+		}
+	}
 
 
 	if (bindingData.changeHandler)
