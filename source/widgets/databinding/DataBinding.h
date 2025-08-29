@@ -13,9 +13,8 @@
 #define Bind_method_to_XML(method, xmlElement, attributeName) XMLBindingCreationHelper::InitializeMethod(&ConvertMemberToGenericFreeFunction<TYPE_OF_THIS, &TYPE_OF_THIS::##method>, xmlElement, attributeName, this)
 #define OnChange(changeHandlerMemberFunction) Then(&ConvertMemberToGenericFreeFunction<TYPE_OF_THIS, &TYPE_OF_THIS::##changeHandlerMemberFunction>, this)
 
-#define Notify_member_changed(member) UIManager::GetInstance().GetBindingDatabase().NotifyBindingChanged(this, offsetof(TYPE_OF_THIS, member), member);
-#define Notify_method_changed(member, data) UIManager::GetInstance().GetBindingDatabase().NotifyBindingChanged(this, (size_t)&member, data);
-
+#define Notify_member_changed(member) UIManager::GetInstance().GetBindingDatabase().NotifyBindingChanged(this, offsetof(TYPE_OF_THIS, member), member, GetRowNumber());
+#define Notify_method_changed(member, data) UIManager::GetInstance().GetBindingDatabase().NotifyBindingChanged(this, (size_t)&member, data, GetRowNumber());
 
 namespace RUIN
 {

@@ -33,13 +33,18 @@ namespace RUIN
 			void* pInstance = nullptr;
 			BindingChangeHandler changeHandler = nullptr;
 
-			std::vector<std::function<void(void*)>> observers;
+			std::vector<std::function<void(void*, int)>> observers;
 			std::string bindingName;
+		};
+
+		struct QueryByNameAndContext
+		{
+			static std::pair<std::string, unsigned> ReturnKeyFromData(const BindingData& data) { return { data.bindingName, data.bindingContextId }; }
 		};
 
 		struct QueryByName
 		{
-			static std::pair<std::string, unsigned> ReturnKeyFromData(const BindingData& data) { return { data.bindingName, data.bindingContextId }; }
+			static std::string ReturnKeyFromData(const BindingData& data) { return data.bindingName; }
 		};
 
 		struct QueryByOffset
@@ -64,25 +69,29 @@ namespace RUIN
 
 		size_t PatchWidgetDataFromBuffer(void* buffer, int bufferSize, void* instance, unsigned bindingContextId);
 
+		// TODO: Currently observers are part of the binding, 
+		// which means if Observe is called for a binding, 
+		// and a virtual widget matching the name is spawned later, we don't listen to the new one yet.
+		// Calling this twice will result in duplicate observer registrations, which is also bad.
 		template<typename BoundDataType>
-		void ObserveBinding(const std::string& bindingName, std::function<void(BoundDataType)> observer, unsigned bindingContextId = 0);
+		void ObserveBinding(const std::string& bindingName, std::function<void(BoundDataType, int)> observer);
 
 
 		void CreateBinding(const std::string& bindingName, void* pInstance, size_t typeHash, size_t memberOffset, size_t memberSize, BindingType type);
 		void AddChangeHandlerToBinding(const std::string& bindingName, BindingChangeHandler func);
 
 		template<typename BoundDataType>
-		void NotifyBindingChanged(void* pInstance, size_t offset, BoundDataType newValue);
+		void NotifyBindingChanged(void* pInstance, size_t offset, BoundDataType newValue, int row);
 
 
 	private:
 		template<typename BoundDataType>
-		void NotifyBindingChangeInternal(const BindingData& binding, BoundDataType newValue);
+		void NotifyBindingChangeInternal(const BindingData& binding, BoundDataType newValue, int row);
 
 		// Returns the amount of bytes read from pData
 		size_t SetDataOnBindingInternal(const BindingData& binding, void* pData, unsigned bindingContextId = 0, bool rawInputStrings = false);
 
-		DB::Table<BindingData, QueryByName, QueryByOffset, QueryByWidget> m_Bindings;
+		DB::Table<BindingData, QueryByNameAndContext, QueryByName, QueryByOffset, QueryByWidget> m_Bindings;
 
 		unsigned m_CurrentContext = 0;
 		unsigned m_NumContexts = 0;
@@ -92,7 +101,7 @@ namespace RUIN
 	template<typename BoundDataType>
 	inline void BindingDatabase::SetDataOnBinding(const std::string& bindingName, BoundDataType data, unsigned bindingContextId)
 	{
-		const auto bindings = m_Bindings.QueryRow<QueryByName>({ bindingName, bindingContextId });
+		const auto bindings = m_Bindings.QueryRow<QueryByNameAndContext>({ bindingName, bindingContextId });
 
 		RASSERT(bindings.size() == 1, std::format("Could not find matching binding! \"{}\"", bindingName).c_str());
 
@@ -104,42 +113,43 @@ namespace RUIN
 	}
 
 	template<typename BoundDataType>
-	inline void BindingDatabase::ObserveBinding(const std::string& bindingName, std::function<void(BoundDataType)> observer, unsigned bindingContextId)
+	inline void BindingDatabase::ObserveBinding(const std::string& bindingName, std::function<void(BoundDataType, int)> observer)
 	{
-		const auto bindings = m_Bindings.QueryRow<QueryByName>({ bindingName, bindingContextId });
+		const auto bindings = m_Bindings.QueryRow<QueryByName>(bindingName);
 
-		RASSERT(bindings.size() == 1, "Could not find matching binding!");
+		RASSERT(bindings.size() > 0, "Could not find any matching bindings!");
 
-		auto& bindingData = *bindings[0];
+		for (auto* binding : bindings)
+		{
+			RASSERT(typeid(BoundDataType).hash_code() == binding->typeHash, "The binding expects a different type of data!");
 
-		RASSERT(typeid(BoundDataType).hash_code() == bindingData.typeHash, "The binding expects a different type of data!");
-
-		bindingData.observers.emplace_back([observer](void* obj) { observer(*static_cast<BoundDataType*>(obj)); });
+			binding->observers.emplace_back([observer](void* obj, int row) { observer(*static_cast<BoundDataType*>(obj), row); });
+		}
 	}
 
 	template<typename BoundDataType>
-	inline void BindingDatabase::NotifyBindingChanged(void* pInstance, size_t offset, BoundDataType newValue)
+	inline void BindingDatabase::NotifyBindingChanged(void* pInstance, size_t offset, BoundDataType newValue, int row)
 	{
 		const auto bindings = m_Bindings.QueryRow<QueryByOffset>({ pInstance, offset });
 
-		if (!bindings.empty())
+		if (bindings.empty())
 		{
 			return;
 		}
 
 		RASSERT(bindings.size() == 1, "Multiple bindings identified by ptr and offset?");
 
-		NotifyBindingChangeInternal(*bindings[0], newValue);
+		NotifyBindingChangeInternal(*bindings[0], newValue, row);
 	}
 
 	template<typename BoundDataType>
-	inline void BindingDatabase::NotifyBindingChangeInternal(const BindingData& binding, BoundDataType newValue)
+	inline void BindingDatabase::NotifyBindingChangeInternal(const BindingData& binding, BoundDataType newValue, int row)
 	{
 		RASSERT(typeid(BoundDataType).hash_code() == binding.typeHash, "The binding expects a different type of data!");
 
 		for (auto& it : binding.observers)
 		{
-			it(&newValue);
+			it(&newValue, row);
 		}
 	}
 }

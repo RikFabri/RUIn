@@ -71,9 +71,10 @@ API void RUIN_SetBindValuei(const char* bindingName, int value);
 API void RUIN_SetBindValuef(const char* bindingName, float value);
 API void RUIN_SetBindValues(const char* bindingName, const char* value);
 
-API void RUIN_BindValuei(const char* bindingName, void(*onChanged)(int));
-API void RUIN_BindValuef(const char* bindingName, void(*onChanged)(float));
-API void RUIN_BindValues(const char* bindingName, void(*onChanged)(const char*));
+// The second parameter indicates the widget's row number. This is useful when listening to a list of templated widgets.
+API void RUIN_BindValuei(const char* bindingName, void(*onChanged)(int, int));
+API void RUIN_BindValuef(const char* bindingName, void(*onChanged)(float, int));
+API void RUIN_BindValues(const char* bindingName, void(*onChanged)(const char*, int));
 
 API void RUIN_BindBuffer(const char* bindingName, void* buffer, unsigned bufferSize);
 // API void RUIN_BindBufferLayout(const char* bindingName, ) // TODO: we could allow explicit buffer layout bindings to add type-safety and increase compatibility with data sources.

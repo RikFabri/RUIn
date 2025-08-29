@@ -267,7 +267,7 @@ size_t RUIN::UIContainer::InstantiateItemTemplate(size_t sourceStreamOffset)
 
 		auto* pWidget = m_Renderables.rbegin()->get();
 		dataRead += pWidget->PatchAllDataFromBuffer(m_DataSource.GetBuffer(dataRead), m_DataSource.GetBufferSize(), contextId);
-
+		pWidget->SetRowNumber(m_ContextIdPerInstantiatedTemplate.size() - 1);
 	}
 
 	UIManager::GetInstance().GetBindingDatabase().PopContext();
@@ -300,4 +300,19 @@ size_t RUIN::UIContainer::PatchAllDataFromBuffer(void* buffer, unsigned bufferSi
 	}
 
 	return dataRead;
+}
+
+void RUIN::UIContainer::SetRowNumber(int row)
+{
+	for (auto& renderable : m_Renderables)
+	{
+		renderable->SetRowNumber(row);
+	}
+
+	m_RowNumber = row;
+}
+
+int RUIN::UIContainer::GetRowNumber() const
+{
+	return m_RowNumber;
 }

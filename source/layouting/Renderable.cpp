@@ -14,3 +14,8 @@ bool RUIN::IRenderable::HandleMouseUp(int cursorX, int cursorY)
 {
 	return false;
 }
+
+int RUIN::IRenderable::GetRowNumber() const
+{
+	return 0;
+}

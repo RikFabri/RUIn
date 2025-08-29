@@ -113,7 +113,7 @@ void RUIN::BindingDatabase::CreateBinding(const std::string& bindingName, void* 
 
 void RUIN::BindingDatabase::AddChangeHandlerToBinding(const std::string& bindingName, BindingChangeHandler func)
 {
-	const auto bindings = m_Bindings.QueryRow<QueryByName>({ bindingName, m_CurrentContext });
+	const auto bindings = m_Bindings.QueryRow<QueryByNameAndContext>({ bindingName, m_CurrentContext });
 
 	RASSERT(bindings.size() == 1, "Tried to add changehandler to missing binding!");
 

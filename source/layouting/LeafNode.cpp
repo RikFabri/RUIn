@@ -70,6 +70,16 @@ size_t RUIN::LeafNode::PatchAllDataFromBuffer(void* buffer, unsigned bufferSize,
 	return UIManager::GetInstance().GetBindingDatabase().PatchWidgetDataFromBuffer(buffer, bufferSize, this, bindingContextId);
 }
 
+void RUIN::LeafNode::SetRowNumber(int row)
+{
+	m_RowNumber = row;
+}
+
+int RUIN::LeafNode::GetRowNumber() const
+{
+	return m_RowNumber;
+}
+
 void RUIN::LeafNode::InitializeVerticalFillmode(const char* mode)
 {
 	if (!mode)

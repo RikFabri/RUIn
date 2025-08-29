@@ -12,7 +12,8 @@ namespace RUIN
 
 		RenderArea CalculateUsedContentArea(const RenderArea& availableArea) final;
 		size_t PatchAllDataFromBuffer(void* buffer, unsigned bufferSize, unsigned bindingContextId) final;
-
+		void SetRowNumber(int row) final;
+		int GetRowNumber() const final;
 
 	private:
 		virtual Erm::vec2f GetDimensions() = 0;
@@ -35,6 +36,8 @@ namespace RUIN
 		void InitializeVerticalFillmode(const char* mode);
 		void InitializeHorizontalFillmode(const char* mode);
 		static FillMode GetFillMode(const char* fillMode);
+
+		int m_RowNumber = 0;
 
 	};
 

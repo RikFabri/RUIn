@@ -42,6 +42,8 @@ namespace RUIN
 		bool HandleMouseUp(int cursorX, int cursorY) override;
 		
 		size_t PatchAllDataFromBuffer(void* buffer, unsigned bufferSize, unsigned bindingContextId) override;
+		void SetRowNumber(int row) override;
+		int GetRowNumber() const override;
 
 		void AddChildWidget(tinyxml2::XMLElement* element);
 
@@ -73,6 +75,8 @@ namespace RUIN
 
 		ClientBuffer m_DataSource;
 		std::string m_ItemTemplate;
+
+		int m_RowNumber = 0;
 	};
 
 }
