@@ -5,8 +5,8 @@ namespace RUIN
 {
 	struct RenderArea
 	{
-		float x, y;
-		float w, h;
+		float x = 0.f, y = 0.f;
+		float w = 0.f, h = 0.f;
 
 		bool ContainsPoint(int px, int py) const
 		{

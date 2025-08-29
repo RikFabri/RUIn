@@ -120,6 +120,8 @@ RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const RenderArea& a
 {
 	RenderContext ctx{};
 	RenderArea usedArea{};
+	usedArea.w = availableArea.x;
+	usedArea.h = availableArea.y;
 
 	m_RenderAreaPerRenderable.clear();
 	m_RenderAreaPerRenderable.reserve(m_Renderables.size());
@@ -133,6 +135,9 @@ RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const RenderArea& a
 		const auto& rendered = m_RenderAreaPerRenderable[ctx.childIndex];
 		assert(ctx.childIndex == m_RenderAreaPerRenderable.size() - 1);
 
+		// TODO: The layouting algorithm has outgrown some of the old comments and design.
+		// clean up/clear up when we're dealing with local space within a widget or global coordinates.
+		//
 		// Track the total area used within this container
 		usedArea.w = std::max(usedArea.w, rendered.w + rendered.x);
 		usedArea.h = std::max(usedArea.h, rendered.h + rendered.y);
