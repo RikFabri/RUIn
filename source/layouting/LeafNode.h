@@ -2,6 +2,7 @@
 #include "Renderable.h"
 #include "tinyxml2.h"
 #include "MathLib.h"
+#include "AlignHelper.h"
 
 namespace RUIN
 {
@@ -18,15 +19,7 @@ namespace RUIN
 	private:
 		virtual Erm::vec2f GetDimensions() = 0;
 
-		enum class FillMode
-		{
-			Left,
-			Right,
-			Center,
-			Stretch
-		};
-		FillMode m_HorizontalFillMode = FillMode::Left;
-		FillMode m_VerticalFillMode = FillMode::Left;
+		AlignHelper m_AlignHelper;
 
 		float m_MarginLeft = 0.f;
 		float m_MarginTop = 0.f;
@@ -35,7 +28,6 @@ namespace RUIN
 
 		void InitializeVerticalFillmode(const char* mode);
 		void InitializeHorizontalFillmode(const char* mode);
-		static FillMode GetFillMode(const char* fillMode);
 
 		int m_RowNumber = 0;
 

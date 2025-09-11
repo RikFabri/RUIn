@@ -7,27 +7,10 @@
 #include "Renderable.h"
 #include "tinyxml2.h"
 #include "MathLib.h"
+#include "AlignHelper.h"
 
 namespace RUIN
 {
-	class AlignHelper
-	{
-	public:
-		AlignHelper(tinyxml2::XMLElement* e);
-		Erm::vec2f GetOffsets(float w, float h, const Erm::vec2f& dims) const;
-		Erm::vec2f GetScales(Erm::vec2f availableArea, Erm::vec2f usedArea) const;
-	private:
-		enum class Align
-		{
-			Left,
-			Center,
-			Right
-		};
-		Align m_HorizontalAlign;
-		Align m_VerticalAlign;
-		bool m_Stretch;
-	};
-
 	class UIContainer : public IRenderable 
 	{
 	public:
@@ -65,6 +48,9 @@ namespace RUIN
 		void DataSourceChanged();
 
 		size_t InstantiateItemTemplate(size_t sourceStreamOffset);
+
+		void InitializeVerticalFillmode(const char* mode);
+		void InitializeHorizontalFillmode(const char* mode);
 
 		AlignHelper m_AlignHelper;
 

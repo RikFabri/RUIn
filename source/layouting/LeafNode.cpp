@@ -18,37 +18,18 @@ RUIN::RenderArea RUIN::LeafNode::CalculateUsedContentArea(const RenderArea& avai
 	const auto dims = GetDimensions();
 
 	RenderArea rc = availableArea;
+	rc.w = dims.x;
+	rc.h = dims.y;
 
-	switch (m_HorizontalFillMode)
-	{
-	case LeafNode::FillMode::Center:
-		rc.x += (availableArea.w - dims.x) / 2.f;
-		break;
-	case LeafNode::FillMode::Right:
-		rc.x += availableArea.w - dims.x;
-		break;
-	}
+	const auto offsets = m_AlignHelper.GetOffsets(dims, { availableArea.w, availableArea.h });
+	const auto scales = m_AlignHelper.GetScales(dims, { availableArea.w, availableArea.h });
 
-	if (m_HorizontalFillMode != LeafNode::FillMode::Stretch)
-	{
-		rc.w = dims.x;
-	}
+	rc.w *= scales.x;
+	rc.h *= scales.y;
 
-	switch (m_VerticalFillMode)
-	{
-	case LeafNode::FillMode::Right:
-		rc.y += availableArea.h - dims.y;
-		break;
-	case LeafNode::FillMode::Center:
-		rc.y += (availableArea.h - dims.y) / 2.f;
-		break;
-	}
-
-	if (m_VerticalFillMode != LeafNode::FillMode::Stretch)
-	{
-		rc.h = dims.y;
-	}
-
+	rc.x += offsets.x;
+	rc.y += offsets.y;
+	
 	// Fit inside of area
 	rc.w = std::min(rc.w, availableArea.w);
 	rc.h = std::min(rc.h, availableArea.h);
@@ -81,40 +62,10 @@ int RUIN::LeafNode::GetRowNumber() const
 
 void RUIN::LeafNode::InitializeVerticalFillmode(const char* mode)
 {
-	if (!mode)
-	{
-		m_VerticalFillMode = FillMode::Left;
-		return;
-	}
-
-	m_VerticalFillMode = GetFillMode(mode);
+	m_AlignHelper.SetVerticalFillMode(mode);
 }
 
 void RUIN::LeafNode::InitializeHorizontalFillmode(const char* mode)
 {
-	if (!mode)
-	{
-		m_HorizontalFillMode = FillMode::Left;
-		return;
-	}
-
-	m_HorizontalFillMode = GetFillMode(mode);
-}
-
-RUIN::LeafNode::FillMode RUIN::LeafNode::GetFillMode(const char* fillMode)
-{
-	if (strcmp(fillMode, "right") == 0)
-	{
-		return FillMode::Right;
-	}
-	else if (strcmp(fillMode, "center") == 0)
-	{
-		return FillMode::Center;
-	}
-	else if (strcmp(fillMode, "stretch") == 0)
-	{
-		return FillMode::Stretch;
-	}
-
-	return FillMode::Left;
+	m_AlignHelper.SetHorizontalFillMode(mode);
 }
