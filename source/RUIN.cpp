@@ -1,5 +1,4 @@
 #include "include/RUIN.h"
-#include <iostream>
 #include "UIManager.h"
 
 using namespace RUIN;

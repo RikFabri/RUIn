@@ -109,9 +109,7 @@ void RUIN::UIContainer::Render(const RenderArea& targetArea)
 	int count = 0;
 	for (const auto& renderable : m_Renderables)
 	{
-		auto& ra = m_RenderAreaPerRenderable[count++];
-		ra.x += targetArea.x;
-		ra.y += targetArea.y;
+		const auto& ra = m_RenderAreaPerRenderable[count++];
 		renderable->Render(ra);
 	}
 }
@@ -119,18 +117,22 @@ void RUIN::UIContainer::Render(const RenderArea& targetArea)
 RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const RenderArea& availableArea)
 {
 	RenderContext ctx{};
+
+	// Render areas should be absolute, not relative. 
+	// This means we need to "fill in" the start position for this area
 	RenderArea usedArea{};
 	usedArea.w = availableArea.x;
 	usedArea.h = availableArea.y;
 
+	// Render areas are not exposed to leaf nodes, they're an implementation detail of containers.
 	m_RenderAreaPerRenderable.clear();
 	m_RenderAreaPerRenderable.reserve(m_Renderables.size());
 	for (auto& renderable : m_Renderables)
 	{
-		// The canvas the child element is allowed to use
+		// The canvas the child element is allowed to use (container behaviour)
 		const auto available = GetAreaForChild(availableArea, usedArea, ctx);
 
-		// The area within the canvas actually used
+		// Traverse widget tree, let widgets take up all or part of the available space
 		m_RenderAreaPerRenderable.emplace_back(renderable->CalculateUsedContentArea(available));
 		const auto& rendered = m_RenderAreaPerRenderable[ctx.childIndex];
 		assert(ctx.childIndex == m_RenderAreaPerRenderable.size() - 1);
@@ -150,6 +152,7 @@ RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const RenderArea& a
 	usedArea.w += offset.x;
 	usedArea.h += offset.y;
 
+	// Apply content-aware operations to children
 	for (auto& renderableArea : m_RenderAreaPerRenderable)
 	{
 		renderableArea.x += offset.x;

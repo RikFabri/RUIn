@@ -1,6 +1,5 @@
 #include "LeafNode.h"
 #include "../UIManager.h"
-#include <algorithm>
 
 RUIN::LeafNode::LeafNode(tinyxml2::XMLElement* e)
 	: IRenderable()
