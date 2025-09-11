@@ -37,7 +37,7 @@ void RUIN::XMLBindingCreationHelper::InitializeMethod(void(*method)(void*, const
 		// TODO: We should probably union this instead
 		static_assert(sizeof(method) >= sizeof(size_t), "We're reusing the offset field to store method pointers.");
 
-		AddBinding(instance, typeid(std::string).hash_code(), (size_t)method, sizeof(void*), bindingName, attribute, BindingDatabase::BindingType::FUNCTION);
+		AddBinding(instance, typeid(std::string).hash_code(), (size_t)method, sizeof(void*), bindingName, BindingDatabase::BindingType::FUNCTION);
 	}
 	else
 	{
@@ -62,7 +62,7 @@ RUIN::ChangeHandlerHelper RUIN::XMLBindingCreationHelper::InitializeMember(size_
 
 	if (isBinding)
 	{
-		AddBinding(instance, typeid(std::string).hash_code(), memberOffset, sizeof(std::string), bindingName, attribute, BindingDatabase::BindingType::STR);
+		AddBinding(instance, typeid(std::string).hash_code(), memberOffset, sizeof(std::string), bindingName, BindingDatabase::BindingType::STR);
 	}
 
 	return ChangeHandlerHelper{ isBinding, bindingName };
@@ -86,7 +86,7 @@ RUIN::ChangeHandlerHelper RUIN::XMLBindingCreationHelper::InitializeMember(size_
 	return ChangeHandlerHelper{ isBound, bindingName };
 }
 
-void RUIN::XMLBindingCreationHelper::AddBinding(void* pInstance, size_t typeHash, size_t memberOffset, size_t memberSize, const std::string& bindingName, const std::string& attribute, BindingDatabase::BindingType type)
+void RUIN::XMLBindingCreationHelper::AddBinding(void* pInstance, size_t typeHash, size_t memberOffset, size_t memberSize, const std::string& bindingName, BindingDatabase::BindingType type)
 {
 	UIManager::GetInstance().GetBindingDatabase().CreateBinding(bindingName, pInstance, typeHash, memberOffset, memberSize, type);
 }

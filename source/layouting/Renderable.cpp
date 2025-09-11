@@ -1,16 +1,16 @@
 #include "Renderable.h"
 
-bool RUIN::IRenderable::HandleMouseMoved(int cursorX, int cursorY)
+bool RUIN::IRenderable::HandleMouseMoved(int, int)
 {
 	return false;
 }
 
-bool RUIN::IRenderable::HandleMouseDown(int cursorX, int cursorY)
+bool RUIN::IRenderable::HandleMouseDown(int, int)
 {
 	return false;
 }
 
-bool RUIN::IRenderable::HandleMouseUp(int cursorX, int cursorY)
+bool RUIN::IRenderable::HandleMouseUp(int, int)
 {
 	return false;
 }

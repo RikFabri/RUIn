@@ -24,7 +24,7 @@ namespace RUIN
 		bool HandleMouseDown(int cursorX, int cursorY) override;
 		bool HandleMouseUp(int cursorX, int cursorY) override;
 		
-		size_t PatchAllDataFromBuffer(void* buffer, unsigned bufferSize, unsigned bindingContextId) override;
+		size_t PatchAllDataFromBuffer(void* buffer, unsigned bufferSize) override;
 		void SetRowNumber(int row) override;
 		int GetRowNumber() const override;
 
@@ -56,8 +56,6 @@ namespace RUIN
 
 		std::vector<std::unique_ptr<IRenderable>> m_Renderables;
 		std::vector<RenderArea> m_RenderAreaPerRenderable;
-
-		std::vector<unsigned> m_ContextIdPerInstantiatedTemplate;
 
 		ClientBuffer m_DataSource;
 		std::string m_ItemTemplate;

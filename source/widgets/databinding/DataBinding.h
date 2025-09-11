@@ -64,7 +64,7 @@ namespace RUIN
 		template<typename MemberType>
 		static std::tuple<bool, std::string> InitializeMemberGeneric(size_t memberOffset, MemberType& member, tinyxml2::XMLElement* element, const char* attribute, void* instance);
 
-		static void AddBinding(void* pInstance, size_t typeHash, size_t memberOffset, size_t memberSize, const std::string& bindingName, const std::string& attribute, BindingDatabase::BindingType type);
+		static void AddBinding(void* pInstance, size_t typeHash, size_t memberOffset, size_t memberSize, const std::string& bindingName, BindingDatabase::BindingType type);
 
 		static std::string ParseBinding(std::string& value, bool& isBinding);
 	};
@@ -91,11 +91,11 @@ namespace RUIN
 				type = BindingDatabase::BindingType::STR;
 			}
 
-			AddBinding(instance, typeid(member).hash_code(), memberOffset, sizeof(MemberType), bindingName, attribute, type);
+			AddBinding(instance, typeid(member).hash_code(), memberOffset, sizeof(MemberType), bindingName, type);
 		}
 		else
 		{
-			if constexpr (std::is_pod_v<MemberType>) {
+			if constexpr (std::is_trivial_v<MemberType>) {
 				element->QueryAttribute(attribute, &member);
 			}
 			else

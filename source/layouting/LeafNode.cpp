@@ -45,9 +45,9 @@ RUIN::RenderArea RUIN::LeafNode::CalculateUsedContentArea(const RenderArea& avai
 	return rc;
 }
 
-size_t RUIN::LeafNode::PatchAllDataFromBuffer(void* buffer, unsigned bufferSize, unsigned bindingContextId)
+size_t RUIN::LeafNode::PatchAllDataFromBuffer(void* buffer, unsigned bufferSize)
 {
-	return UIManager::GetInstance().GetBindingDatabase().PatchWidgetDataFromBuffer(buffer, bufferSize, this, bindingContextId);
+	return UIManager::GetInstance().GetBindingDatabase().PatchWidgetDataFromBuffer(buffer, bufferSize, this);
 }
 
 void RUIN::LeafNode::SetRowNumber(int row)

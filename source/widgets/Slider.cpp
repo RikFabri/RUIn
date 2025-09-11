@@ -42,7 +42,7 @@ Erm::vec2f RUIN::Slider::GetDimensions()
 	return Erm::vec2f((float)w + 4.f, (float)h + 4.f);
 }
 
-bool RUIN::Slider::HandleMouseMoved(int cursorX, int cursorY)
+bool RUIN::Slider::HandleMouseMoved(int cursorX, int )
 {
 	if (!m_Editing)
 	{
@@ -51,7 +51,7 @@ bool RUIN::Slider::HandleMouseMoved(int cursorX, int cursorY)
 
 	// TODO: working with this offset is quite bad, can we provide widgets their renderArea in a clean way?
 	const auto offset = cursorX - m_StartPos.x;
-	m_Value = OffsetToValue(offset);
+	m_Value = OffsetToValue((float)offset);
 	OnTextChanged();
 
 	Notify_member_changed(m_Value);
@@ -68,7 +68,7 @@ bool RUIN::Slider::HandleMouseDown(int cursorX, int cursorY)
 	return true;
 }
 
-bool RUIN::Slider::HandleMouseUp(int cursorX, int cursorY)
+bool RUIN::Slider::HandleMouseUp(int, int)
 {
 	m_Editing = false;
 	return true;

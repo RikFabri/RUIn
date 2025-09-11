@@ -36,7 +36,7 @@ RUIN::UIContainer::UIContainer(tinyxml2::XMLElement* element)
 	}
 }
 
-void RUIN::UIContainer::Render(const RenderArea& targetArea)
+void RUIN::UIContainer::Render(const RenderArea&)
 {
 	int count = 0;
 	for (const auto& renderable : m_Renderables)
@@ -159,9 +159,7 @@ void RUIN::UIContainer::DataSourceChanged()
 	unsigned count = 0;
 	for (auto& renderable : m_Renderables)
 	{
-		auto bindingContext = m_ContextIdPerInstantiatedTemplate[count++];
-
-		dataRead += renderable->PatchAllDataFromBuffer(m_DataSource.GetBuffer(dataRead), bufferSize - dataRead, bindingContext);
+		dataRead += renderable->PatchAllDataFromBuffer(m_DataSource.GetBuffer(dataRead), unsigned(bufferSize - dataRead));
 
 		if (dataRead >= bufferSize)
 		{
@@ -193,8 +191,7 @@ size_t RUIN::UIContainer::InstantiateItemTemplate(size_t sourceStreamOffset)
 	const char* rootElementName = pRoot->Name();
 	RASSERT(strcmp(rootElementName, "ItemTemplate") == 0, "Instantiating item template, but xml doesn't have an itemtemplate root!");
 
-	const auto contextId = UIManager::GetInstance().GetBindingDatabase().PushNewContext();
-	m_ContextIdPerInstantiatedTemplate.emplace_back(contextId);
+	std::ignore = UIManager::GetInstance().GetBindingDatabase().PushNewContext();
 
 	size_t dataRead = sourceStreamOffset;
 
@@ -203,8 +200,8 @@ size_t RUIN::UIContainer::InstantiateItemTemplate(size_t sourceStreamOffset)
 		AddChildWidget(e);
 
 		auto* pWidget = m_Renderables.rbegin()->get();
-		dataRead += pWidget->PatchAllDataFromBuffer(m_DataSource.GetBuffer(dataRead), m_DataSource.GetBufferSize(), contextId);
-		pWidget->SetRowNumber(m_ContextIdPerInstantiatedTemplate.size() - 1);
+		dataRead += pWidget->PatchAllDataFromBuffer(m_DataSource.GetBuffer(dataRead), m_DataSource.GetBufferSize());
+		pWidget->SetRowNumber(unsigned(m_Renderables.size() - 1));
 	}
 
 	UIManager::GetInstance().GetBindingDatabase().PopContext();
@@ -237,13 +234,13 @@ bool RUIN::UIContainer::HandleMouseUp(int cursorX, int cursorY)
 	return HandleMouseEventGeneric(cursorX, cursorY, [](IRenderable* obj, int x, int y) -> bool { return obj->HandleMouseUp(x, y); });
 }
 
-size_t RUIN::UIContainer::PatchAllDataFromBuffer(void* buffer, unsigned bufferSize, unsigned bindingContextId)
+size_t RUIN::UIContainer::PatchAllDataFromBuffer(void* buffer, unsigned bufferSize)
 {
-	auto dataRead = UIManager::GetInstance().GetBindingDatabase().PatchWidgetDataFromBuffer(buffer, bufferSize, this, bindingContextId);
+	auto dataRead = UIManager::GetInstance().GetBindingDatabase().PatchWidgetDataFromBuffer(buffer, bufferSize, this);
 
 	for (auto& renderable : m_Renderables)
 	{
-		dataRead += renderable->PatchAllDataFromBuffer((char*)buffer + dataRead, bufferSize - dataRead, bindingContextId);
+		dataRead += renderable->PatchAllDataFromBuffer((char*)buffer + dataRead, unsigned(bufferSize - dataRead));
 	}
 
 	return dataRead;

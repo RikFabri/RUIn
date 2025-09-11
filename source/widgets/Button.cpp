@@ -30,26 +30,26 @@ void RUIN::Button::Render(const RenderArea& targetArea)
 	}
 }
 
-RUIN::RenderArea RUIN::Button::GetAreaForChild(const RenderArea& availableArea, RenderArea& usedArea, RenderContext& ctx) const
+RUIN::RenderArea RUIN::Button::GetAreaForChild(const RenderArea& availableArea, RenderArea&, RenderContext&) const
 {
 	RenderArea rc = availableArea;
 
 	return rc;
 }
 
-bool RUIN::Button::HandleMouseMoved(int cursorX, int cursorY)
+bool RUIN::Button::HandleMouseMoved(int, int)
 {
 	m_ButtonState = ButtonState::Hovered;
 	return true;
 }
 
-bool RUIN::Button::HandleMouseDown(int cursorX, int cursorY)
+bool RUIN::Button::HandleMouseDown(int, int)
 {
 	m_ButtonState = ButtonState::Down;
 	return true;
 }
 
-bool RUIN::Button::HandleMouseUp(int cursorX, int cursorY)
+bool RUIN::Button::HandleMouseUp(int, int)
 {
 	if (m_OnClick.empty())
 		return false;

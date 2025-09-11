@@ -3,8 +3,8 @@
 
 RUIN::Window::Window(int width, int height) 
 	: UIContainer(nullptr)
-	, m_Width(width)
-	, m_Height(height)
+	, m_Width((float)width)
+	, m_Height((float)height)
 {
 }
 
@@ -18,7 +18,7 @@ void RUIN::Window::Render(const RenderArea& targetArea)
 	UIContainer::Render(ra);
 }
 
-RUIN::RenderArea RUIN::Window::GetAreaForChild(const RenderArea& availableArea, RenderArea& usedArea, RenderContext& ctx) const
+RUIN::RenderArea RUIN::Window::GetAreaForChild(const RenderArea&, RenderArea&, RenderContext&) const
 {
 	RenderArea ra{};
 	ra.w = m_Width;

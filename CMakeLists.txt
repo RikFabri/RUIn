@@ -71,3 +71,6 @@ source/external/tinyxml2/
 source/math/
 source/utils/
 )
+
+set_property(TARGET RUIn PROPERTY COMPILE_WARNING_AS_ERROR ON)
+target_compile_options(RUIn PRIVATE /W4)

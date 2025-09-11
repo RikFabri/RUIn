@@ -54,7 +54,7 @@ namespace RUIN
 
 		struct QueryByWidget
 		{
-			static std::pair<void*, unsigned> ReturnKeyFromData(const BindingData& data) { return { data.pInstance, data.bindingContextId }; }
+			static void* ReturnKeyFromData(const BindingData& data) { return data.pInstance; }
 		};
 #pragma endregion
 
@@ -67,7 +67,7 @@ namespace RUIN
 		template<typename BoundDataType>
 		void SetDataOnBinding(const std::string& bindingName, BoundDataType data, unsigned bindingContextId = 0);
 
-		size_t PatchWidgetDataFromBuffer(void* buffer, int bufferSize, void* instance, unsigned bindingContextId);
+		size_t PatchWidgetDataFromBuffer(void* buffer, int bufferSize, void* instance);
 
 		// TODO: Currently observers are part of the binding, 
 		// which means if Observe is called for a binding, 
@@ -89,7 +89,7 @@ namespace RUIN
 		void NotifyBindingChangeInternal(const BindingData& binding, BoundDataType newValue, int row);
 
 		// Returns the amount of bytes read from pData
-		size_t SetDataOnBindingInternal(const BindingData& binding, void* pData, unsigned bindingContextId = 0, bool rawInputStrings = false);
+		size_t SetDataOnBindingInternal(const BindingData& binding, void* pData, bool rawInputStrings = false);
 
 		DB::Table<BindingData, QueryByNameAndContext, QueryByName, QueryByOffset, QueryByWidget> m_Bindings;
 
@@ -109,7 +109,7 @@ namespace RUIN
 
 		RASSERT(typeid(data).hash_code() == bindingData.typeHash, "The binding expects a different type of data!");
 
-		SetDataOnBindingInternal(bindingData, (void*) & data, bindingContextId);
+		SetDataOnBindingInternal(bindingData, (void*) & data);
 	}
 
 	template<typename BoundDataType>

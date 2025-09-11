@@ -20,7 +20,7 @@ namespace RUIN
 		virtual bool HandleMouseDown(int cursorX, int cursorY);
 		virtual bool HandleMouseUp(int cursorX, int cursorY);
 
-		virtual size_t PatchAllDataFromBuffer(void* buffer, unsigned bufferSize, unsigned bindingContextId) = 0;
+		virtual size_t PatchAllDataFromBuffer(void* buffer, unsigned bufferSize) = 0;
 
 		// Ugly in an interface. Base class?
 		virtual void SetRowNumber(int row) = 0;

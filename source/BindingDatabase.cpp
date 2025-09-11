@@ -17,7 +17,7 @@ void RUIN::BindingDatabase::PopContext()
 	--m_CurrentContext;
 }
 
-size_t RUIN::BindingDatabase::SetDataOnBindingInternal(const BindingData& bindingData, void* pData, unsigned bindingContextId, bool rawInputStrings)
+size_t RUIN::BindingDatabase::SetDataOnBindingInternal(const BindingData& bindingData, void* pData, bool rawInputStrings)
 {
 	size_t dataRead = bindingData.typeSize;
 
@@ -71,9 +71,9 @@ size_t RUIN::BindingDatabase::SetDataOnBindingInternal(const BindingData& bindin
 	return dataRead;
 }
 
-size_t RUIN::BindingDatabase::PatchWidgetDataFromBuffer(void* buffer, int bufferSize, void* instance, unsigned bindingContextId)
+size_t RUIN::BindingDatabase::PatchWidgetDataFromBuffer(void* buffer, int bufferSize, void* instance)
 {
-	const auto bindings = m_Bindings.QueryRow<QueryByWidget>({ instance, bindingContextId });
+	const auto bindings = m_Bindings.QueryRow<QueryByWidget>(instance);
 
 	if (bindings.empty())
 	{
@@ -87,7 +87,7 @@ size_t RUIN::BindingDatabase::PatchWidgetDataFromBuffer(void* buffer, int buffer
 	for (const auto* binding : bindings)
 	{
 		auto* pBuffer = (char*)buffer + dataRead;
-		dataRead += SetDataOnBindingInternal(*binding, pBuffer, bindingContextId, true);
+		dataRead += SetDataOnBindingInternal(*binding, pBuffer, true);
 
 		RASSERT(dataRead <= bufferSize, std::format("Not enough data in bound buffer! While binding {}", binding->bindingName).c_str());
 	}
