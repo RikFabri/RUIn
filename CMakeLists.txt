@@ -4,8 +4,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
 project(RUIn)
 
-add_compile_definitions(RUIN_BUILD)
-
 file(GLOB WIDGET_SOURCES
     "source/widgets/*.cpp"
     "source/widgets/*.h"
@@ -66,11 +64,62 @@ add_library(RUIn SHARED source/RUIN.cpp source/UIManager.cpp source/BindingDatab
     ${UTIL_SOURCES}
 )
 
+target_compile_definitions(RUIn PRIVATE RUIN_BUILD)
+
 target_include_directories(RUIn PRIVATE 
 source/external/tinyxml2/
 source/math/
 source/utils/
 )
 
+if (MSVC)
 set_property(TARGET RUIn PROPERTY COMPILE_WARNING_AS_ERROR ON)
 target_compile_options(RUIn PRIVATE /W4)
+endif()
+
+# support find_package
+include(GNUInstallDirs)
+
+target_include_directories(RUIn PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/source/include/>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+install(TARGETS RUIn EXPORT RUInTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+install(FILES source/include/RUIN.h
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(EXPORT RUInTargets
+    FILE RUInTargets.cmake
+    NAMESPACE RUIn::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RUIn
+)
+
+export(EXPORT RUInTargets
+    NAMESPACE RUIn::
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/RUInTargets.cmake)
+
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/RUInConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/RUInConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RUIn
+)
+
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/RUInConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/RUInConfig.cmake
+    INSTALL_DESTINATION .
+)
+
+install(FILES 
+    ${CMAKE_CURRENT_BINARY_DIR}/RUInConfig.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RUIn
+) 
