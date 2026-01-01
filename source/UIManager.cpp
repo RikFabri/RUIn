@@ -5,6 +5,7 @@
 #include "widgets/Label.h"
 #include "widgets/Button.h"
 #include "widgets/Slider.h"
+#include "widgets/Canvas.h"
 
 #include <format>
 
@@ -30,6 +31,7 @@ void RUIN::UIManager::RegisterBuiltInWidgetFactories()
 	m_WidgetFactories["Label"] = [](tinyxml2::XMLElement* pElement) { return new Label(pElement); };
 	m_WidgetFactories["Button"] = [](tinyxml2::XMLElement* pElement) { return new Button(pElement); };
 	m_WidgetFactories["Slider"] = [](tinyxml2::XMLElement* pElement) { return new Slider(pElement); };
+	m_WidgetFactories["Canvas"] = [](tinyxml2::XMLElement* pElement) { return new Canvas(pElement); };
 }
 
 bool RUIN::UIManager::LoadXML(const std::string& path)
