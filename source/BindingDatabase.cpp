@@ -49,7 +49,7 @@ size_t RUIN::BindingDatabase::SetDataOnBindingInternal(const BindingData& bindin
 		}
 		else
 		{
-			auto* string = static_cast<const std::string*>(pData);
+			const auto* string = static_cast<const std::string*>(pData);
 			func(bindingData.pInstance, string->c_str());
 		}
 	}
@@ -80,8 +80,7 @@ size_t RUIN::BindingDatabase::SetDataOnBindingInternal(const BindingData& bindin
 
 	// This move looks evil, but if we have a string that's not raw, then the generic type implementation has copied it to create this buffer
 	// So it would be wasteful to copy again.
-	// Immutable buffers will always be raw strings, as they cross dll boundaries.
-	// TODO: can this be handled more explicitly by overloading const void* vs void*, when patching a value vs a buffer?
+	// Immutable buffers will always contain raw strings, as they cross dll boundaries.
 	*pMember = std::move(*string);
 
 	if (bindingData.changeHandler)
