@@ -32,8 +32,9 @@ typedef void(*RUIN_DrawRectangleFn)(RUIN_Rectangle, RUIN_Colour);
 typedef void(*RUIN_DrawTextureFn)(RUIN_Rectangle, void* texture);
 typedef void*(*RUIN_AllocateTextureFromImageFn)(const char* path);
 typedef void*(*RUIN_AllocateTextureFromTextFn)(const char* string);
-typedef void(*RUIN_FreeTexture)(const void* texture);
-typedef void(*RUIN_QueryTextureDimensions)(const void* texture, uint32_t* outWidth, uint32_t* outHeight);
+typedef void(*RUIN_FreeTextureFn)(const void* texture);
+typedef void(*RUIN_QueryTextureDimensionsFn)(const void* texture, uint32_t* outWidth, uint32_t* outHeight);
+typedef void(*RUIN_SetClipRectangleFn)(RUIN_Rectangle*);
 
 typedef struct RUIN_Callbacks
 {
@@ -41,8 +42,9 @@ typedef struct RUIN_Callbacks
     RUIN_DrawTextureFn drawTextureFn;
     RUIN_AllocateTextureFromImageFn allocateTextureFromImageFn;
     RUIN_AllocateTextureFromTextFn allocateTextureFromTextFn;
-    RUIN_QueryTextureDimensions queryTextureDimensions;
-    RUIN_FreeTexture freeTexture;
+    RUIN_QueryTextureDimensionsFn queryTextureDimensions;
+    RUIN_FreeTextureFn freeTexture;
+    RUIN_SetClipRectangleFn setClipRectangle;
 } RUIN_Callbacks;
 
 typedef enum RUIN_Result

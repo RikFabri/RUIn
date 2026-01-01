@@ -63,6 +63,8 @@ void RUIN::UIManager::Update()
 
 void RUIN::UIManager::Render()
 {
+	// TODO: Assert that the user has updated ruin at least once.
+
 	RenderArea ra{};
 	m_Window.Render(ra);
 }
@@ -134,6 +136,23 @@ void RUIN::UIManager::QueryTextureDimensions(const ClientTexture& texture, uint3
 void RUIN::UIManager::DrawTexture(const ClientTexture& texture, const RenderArea& ra) const
 {
 	m_Callbacks.drawTextureFn(ra.GetRect(), texture.GetClientData());
+}
+
+void RUIN::UIManager::SetClipRect(const std::optional<RenderArea>& ra) const
+{
+	if (!ra)
+	{
+		m_Callbacks.setClipRectangle(nullptr);
+		return;
+	}
+
+	RUIN_Rectangle rect{};
+	rect.x = (int)ra->x;
+	rect.y = (int)ra->y;
+	rect.w = (int)ra->w;
+	rect.h = (int)ra->h;
+
+	m_Callbacks.setClipRectangle(&rect);
 }
 
 void RUIN::UIManager::RegisterWidgetFactory(const std::string& widgetType, const WidgetFactoryFn& factoryFunc)

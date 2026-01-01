@@ -10,6 +10,7 @@
 #include <string>
 #include <unordered_map>
 #include <functional>
+#include <optional>
 
 namespace RUIN
 {
@@ -39,6 +40,7 @@ namespace RUIN
 		void FreeTexture(void* texture);
 		void QueryTextureDimensions(const ClientTexture& texture, uint32_t& width, uint32_t& height) const;
 		void DrawTexture(const ClientTexture& texture, const RenderArea& ra) const;
+		void SetClipRect(const std::optional<RenderArea>& ra) const;
 
 
 		using WidgetFactoryFn = std::function<IRenderable*(tinyxml2::XMLElement*)>;

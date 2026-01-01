@@ -9,7 +9,8 @@ RUIN_Result RUIN_InitializeCallbacks(const RUIN_Callbacks* callbacks)
         callbacks->allocateTextureFromTextFn == nullptr ||
         callbacks->drawRectangleFn == nullptr ||
         callbacks->drawTextureFn == nullptr ||
-        callbacks->freeTexture == nullptr)
+        callbacks->freeTexture == nullptr ||
+        callbacks->setClipRectangle == nullptr)
     {
         UIManager::GetInstance().SetErrorMessage("Not all callbacks were provided!");
         return RUIN_Fail;
