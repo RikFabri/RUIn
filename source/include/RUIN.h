@@ -61,6 +61,8 @@ API void RUIN_RenderUI();
 
 API RUIN_Result RUIN_LoadUIFromXML(const char* path);
 
+API void RUIN_SetWindowDimensions(unsigned width, unsigned height);
+
 // Event handling
 API void RUIN_CursorMoved(int cursorX, int cursorY);
 API void RUIN_CursorUp(int cursorX, int cursorY);

@@ -65,6 +65,11 @@ void RUIN::UIManager::Render()
 	m_Window.Render(ra);
 }
 
+void RUIN::UIManager::SetWindowSize(unsigned width, unsigned height)
+{
+	m_Window.SetDimensions(width, height);
+}
+
 void RUIN::UIManager::OnCursorMoved(int cursorX, int cursorY)
 {
 	m_Window.HandleMouseMoved(cursorX, cursorY);

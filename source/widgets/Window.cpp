@@ -18,6 +18,12 @@ void RUIN::Window::Render(const RenderArea& targetArea)
 	UIContainer::Render(ra);
 }
 
+void RUIN::Window::SetDimensions(unsigned width, unsigned height)
+{
+	m_Width = (float)width;
+	m_Height = (float)height;
+}
+
 RUIN::RenderArea RUIN::Window::GetAreaForChild(const RenderArea&, RenderArea&, RenderContext&) const
 {
 	RenderArea ra{};

@@ -40,6 +40,11 @@ RUIN_Result RUIN_LoadUIFromXML(const char* path)
     return UIManager::GetInstance().LoadXML(path) ? RUIN_Success : RUIN_Fail;
 }
 
+void RUIN_SetWindowDimensions(unsigned width, unsigned height)
+{
+    UIManager::GetInstance().SetWindowSize(width, height);
+}
+
 void RUIN_CursorMoved(int cursorX, int cursorY)
 {
     UIManager::GetInstance().OnCursorMoved(cursorX, cursorY);

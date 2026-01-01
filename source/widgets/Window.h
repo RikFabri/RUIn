@@ -11,6 +11,8 @@ public:
 
 	void Render(const RenderArea& targetArea) override;
 
+	void SetDimensions(unsigned width, unsigned height);
+
 private:
 	float m_Width, m_Height;
 

@@ -21,6 +21,8 @@ namespace RUIN
 		void Update();
 		void Render();
 
+		void SetWindowSize(unsigned width, unsigned height);
+
 		// Input events
 		void OnCursorMoved(int cursorX, int cursorY);
 		void OnCursorDown(int cursorX, int cursorY);
