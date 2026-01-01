@@ -67,7 +67,7 @@ namespace RUIN
 		template<typename BoundDataType>
 		void SetDataOnBinding(const std::string& bindingName, BoundDataType data, unsigned bindingContextId = 0);
 
-		size_t PatchWidgetDataFromBuffer(void* buffer, int bufferSize, void* instance);
+		size_t PatchWidgetDataFromBuffer(const void* buffer, int bufferSize, void* instance);
 
 		// TODO: Currently observers are part of the binding, 
 		// which means if Observe is called for a binding, 
@@ -89,6 +89,7 @@ namespace RUIN
 		void NotifyBindingChangeInternal(const BindingData& binding, BoundDataType newValue, int row);
 
 		// Returns the amount of bytes read from pData
+		size_t SetDataOnBindingInternal(const BindingData& binding, const void* pData, bool rawInputStrings = false);
 		size_t SetDataOnBindingInternal(const BindingData& binding, void* pData, bool rawInputStrings = false);
 
 		DB::Table<BindingData, QueryByNameAndContext, QueryByName, QueryByOffset, QueryByWidget> m_Bindings;

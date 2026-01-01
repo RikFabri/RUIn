@@ -76,7 +76,7 @@ API void RUIN_BindValuei(const char* bindingName, void(*onChanged)(int, int));
 API void RUIN_BindValuef(const char* bindingName, void(*onChanged)(float, int));
 API void RUIN_BindValues(const char* bindingName, void(*onChanged)(const char*, int));
 
-API void RUIN_BindBuffer(const char* bindingName, void* buffer, unsigned bufferSize);
+API void RUIN_BindBuffer(const char* bindingName, const void* buffer, unsigned bufferSize);
 // API void RUIN_BindBufferLayout(const char* bindingName, ) // TODO: we could allow explicit buffer layout bindings to add type-safety and increase compatibility with data sources.
 
 API void RUIN_RegisterNamedCallback(const char* name, void(*func)(void));

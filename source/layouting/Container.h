@@ -24,7 +24,7 @@ namespace RUIN
 		bool HandleMouseDown(int cursorX, int cursorY) override;
 		bool HandleMouseUp(int cursorX, int cursorY) override;
 		
-		size_t PatchAllDataFromBuffer(void* buffer, unsigned bufferSize) override;
+		size_t PatchAllDataFromBuffer(const void* buffer, unsigned bufferSize) override;
 		void SetRowNumber(int row) override;
 		int GetRowNumber() const override;
 

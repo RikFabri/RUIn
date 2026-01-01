@@ -8,13 +8,13 @@ namespace RUIN
 	class ClientBuffer
 	{
 	public:
-		ClientBuffer(unsigned size, void* data);
+		ClientBuffer(unsigned size, const void* data);
 		ClientBuffer();
 
 		unsigned GetBufferSize() const;
-		void* GetBuffer(size_t offset = 0);
+		const void* GetBuffer(size_t offset = 0) const;
 	private:
-		void* m_pClientData;
+		const void* m_pClientData;
 		unsigned m_Size;
 	};
 

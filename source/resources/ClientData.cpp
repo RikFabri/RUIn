@@ -51,7 +51,7 @@ void RUIN::ClientTexture::Draw(const RenderArea& ra) const
 	UIManager::GetInstance().DrawTexture(*this, ra);
 }
 
-RUIN::ClientBuffer::ClientBuffer(unsigned size, void* data)
+RUIN::ClientBuffer::ClientBuffer(unsigned size, const void* data)
 	: m_Size(size)
 	, m_pClientData(data)
 {
@@ -68,7 +68,7 @@ unsigned RUIN::ClientBuffer::GetBufferSize() const
 	return m_Size;
 }
 
-void* RUIN::ClientBuffer::GetBuffer(size_t offset)
+const void* RUIN::ClientBuffer::GetBuffer(size_t offset) const
 {
 	RASSERT(offset < m_Size, "Accessing buffer with offset bigger than size!");
 

@@ -12,7 +12,7 @@ namespace RUIN
 		LeafNode(tinyxml2::XMLElement* e);
 
 		RenderArea CalculateUsedContentArea(const RenderArea& availableArea) final;
-		size_t PatchAllDataFromBuffer(void* buffer, unsigned bufferSize) final;
+		size_t PatchAllDataFromBuffer(const void* buffer, unsigned bufferSize) final;
 		void SetRowNumber(int row) final;
 		int GetRowNumber() const final;
 

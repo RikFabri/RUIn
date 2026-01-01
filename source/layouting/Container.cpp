@@ -234,13 +234,13 @@ bool RUIN::UIContainer::HandleMouseUp(int cursorX, int cursorY)
 	return HandleMouseEventGeneric(cursorX, cursorY, [](IRenderable* obj, int x, int y) -> bool { return obj->HandleMouseUp(x, y); });
 }
 
-size_t RUIN::UIContainer::PatchAllDataFromBuffer(void* buffer, unsigned bufferSize)
+size_t RUIN::UIContainer::PatchAllDataFromBuffer(const void* buffer, unsigned bufferSize)
 {
 	auto dataRead = UIManager::GetInstance().GetBindingDatabase().PatchWidgetDataFromBuffer(buffer, bufferSize, this);
 
 	for (auto& renderable : m_Renderables)
 	{
-		dataRead += renderable->PatchAllDataFromBuffer((char*)buffer + dataRead, unsigned(bufferSize - dataRead));
+		dataRead += renderable->PatchAllDataFromBuffer((const char*)buffer + dataRead, unsigned(bufferSize - dataRead));
 	}
 
 	return dataRead;

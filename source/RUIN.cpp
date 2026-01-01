@@ -85,7 +85,7 @@ void RUIN_BindValues(const char* bindingName, void(*onChanged)(const char*, int)
     UIManager::GetInstance().GetBindingDatabase().ObserveBinding<std::string>(bindingName, [onChanged](std::string str, int row) { onChanged(str.c_str(), row); });
 }
 
-void RUIN_BindBuffer(const char* bindingName, void* buffer, unsigned bufferSize)
+void RUIN_BindBuffer(const char* bindingName, const void* buffer, unsigned bufferSize)
 {
     ClientBuffer clientBuffer
     {
