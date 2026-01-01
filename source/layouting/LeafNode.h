@@ -16,10 +16,13 @@ namespace RUIN
 		void SetRowNumber(int row) final;
 		int GetRowNumber() const final;
 
+		void Render(const RenderArea& targetArea) override;
 	private:
 		virtual Erm::vec2f GetDimensions() = 0;
 
 		AlignHelper m_AlignHelper;
+
+		RUIN_Colour m_BackgroundColour = { 0,0,0,0 };
 
 		float m_MarginLeft = 0.f;
 		float m_MarginTop = 0.f;
@@ -28,6 +31,8 @@ namespace RUIN
 
 		void InitializeVerticalFillmode(const char* mode);
 		void InitializeHorizontalFillmode(const char* mode);
+
+		void InitializeBackgroundColour(const char* col);
 
 		unsigned m_RowNumber = 0;
 

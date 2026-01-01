@@ -1,16 +1,20 @@
 #include "LeafNode.h"
 #include "../UIManager.h"
 
+#include <cctype>
+
 RUIN::LeafNode::LeafNode(tinyxml2::XMLElement* e)
 	: IRenderable()
 {
 	Bind_method_to_XML(InitializeHorizontalFillmode, e, "horizontal-fillMode");
 	Bind_method_to_XML(InitializeVerticalFillmode, e, "vertical-fillMode");
+	Bind_method_to_XML(InitializeBackgroundColour, e, "background-colour");
 
 	Bind_member_to_XML(m_MarginLeft, e, "margin-left");
 	Bind_member_to_XML(m_MarginRight, e, "margin-right");
 	Bind_member_to_XML(m_MarginTop, e, "margin-top");
 	Bind_member_to_XML(m_MarginBottom, e, "margin-bottom");
+
 }
 
 RUIN::RenderArea RUIN::LeafNode::CalculateUsedContentArea(const RenderArea& availableArea)
@@ -60,6 +64,11 @@ int RUIN::LeafNode::GetRowNumber() const
 	return m_RowNumber;
 }
 
+void RUIN::LeafNode::Render(const RenderArea& targetArea)
+{
+	UIManager::GetInstance().DrawRectangle(targetArea, m_BackgroundColour);
+}
+
 void RUIN::LeafNode::InitializeVerticalFillmode(const char* mode)
 {
 	m_AlignHelper.SetVerticalFillMode(mode);
@@ -68,4 +77,53 @@ void RUIN::LeafNode::InitializeVerticalFillmode(const char* mode)
 void RUIN::LeafNode::InitializeHorizontalFillmode(const char* mode)
 {
 	m_AlignHelper.SetHorizontalFillMode(mode);
+}
+
+void RUIN::LeafNode::InitializeBackgroundColour(const char* col)
+{
+	RASSERTF(col[0] == '#', "{} was not a valid hex colour, did not start with #", col);
+	RASSERTF(strlen(col) == 9, "{} was not a valid hex colour, it was not 9 characters", col);
+
+	constexpr auto HexToVal = [](char c) -> uint8_t
+		{
+			if (c >= '0' && c <= '9')
+			{
+				const auto res = c - '0'; (void)res;
+				return c - '0';
+			}
+
+			c = (char)std::toupper(c);
+			
+			if (c >= 'A' && c <= 'F')
+			{
+				return 10 + c - 'A';
+			}
+
+			RASSERT(false, "%c is not a valid hex character");
+			return 0;
+		};
+
+	uint8_t val = 0;
+	val += HexToVal(col[1]) * 16;
+	val += HexToVal(col[2]);
+
+	m_BackgroundColour.r = val;
+
+	val = 0;
+	val += HexToVal(col[3]) * 16;
+	val += HexToVal(col[4]);
+
+	m_BackgroundColour.g = val;
+
+	val = 0;
+	val += HexToVal(col[5]) * 16;
+	val += HexToVal(col[6]);
+
+	m_BackgroundColour.b = val;
+
+	val = 0;
+	val += HexToVal(col[7]) * 16;
+	val += HexToVal(col[8]);
+
+	m_BackgroundColour.a = val;
 }

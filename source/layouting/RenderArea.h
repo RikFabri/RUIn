@@ -8,6 +8,14 @@ namespace RUIN
 		float x = 0.f, y = 0.f;
 		float w = 0.f, h = 0.f;
 
+		bool operator==(const RenderArea& other)
+		{
+			return x == other.x &&
+					y == other.y &&
+					w == other.w &&
+					h == other.h;
+		}
+
 		bool ContainsPoint(int px, int py) const
 		{
 			return x <= px && y <= py && x + w >= px && y + h >= py;
