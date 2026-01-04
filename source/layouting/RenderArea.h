@@ -56,5 +56,41 @@ namespace RUIN
 			x += offset.x;
 			y += offset.y;
 		}
+
+		bool Overlaps(const RenderArea& other) const
+		{
+			return
+				other.x + other.w >= x &&
+				other.y + other.h >= y &&
+				other.x <= x + w &&
+				other.y <= y + h;
+		}
+
+		bool Contains(const RenderArea& other) const
+		{
+			const bool p1 = ContainsPoint(int(other.x), int(other.y));
+			const bool p2 = ContainsPoint(int(other.x + other.w), int(other.y));
+			const bool p3 = ContainsPoint(int(other.x + other.w), int(other.y + other.h));
+			const bool p4 = ContainsPoint(int(other.x), int(other.y + other.h));
+
+			return p1 && p2 && p3 && p4;
+		}
+
+		bool IntersectsEdge(const RenderArea& other) const
+		{
+			if (IsEmpty() && other.IsEmpty()) return true;
+
+			const bool p1 = ContainsPoint(int(other.x), int(other.y));
+			const bool p2 = ContainsPoint(int(other.x + other.w), int(other.y));
+			const bool p3 = ContainsPoint(int(other.x + other.w), int(other.y + other.h));
+			const bool p4 = ContainsPoint(int(other.x), int(other.y + other.h));
+
+			const bool allTheSame =
+				p1 == p2 &&
+				p2 == p3 &&
+				p3 == p4;
+
+			return !allTheSame;
+		}
 	};
 }

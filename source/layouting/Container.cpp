@@ -47,7 +47,11 @@ void RUIN::UIContainer::Render(const RenderArea& renderArea)
 	UIManager::GetInstance().DrawRectangle(renderArea, m_BackgroundColour);
 
 	// TODO: fix up how/when we apply cliprects
-	if (m_ScrollVertical)
+	const bool setClipRect =
+		m_VerticalOverflow != Overflow::Visible &&
+		m_Overflowing;
+
+	if (setClipRect)
 	{
 		UIManager::GetInstance().SetClipRect(renderArea);
 	}
@@ -62,7 +66,7 @@ void RUIN::UIContainer::Render(const RenderArea& renderArea)
 		renderable->Render(ra);
 	}
 
-	if (m_ScrollVertical)
+	if (setClipRect)
 	{
 		UIManager::GetInstance().SetClipRect(std::nullopt);
 	}
@@ -74,11 +78,6 @@ RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const Erm::vec2f& a
 
 	Erm::vec2f area = availableArea;
 
-	// Scrolling
-	if (m_ScrollVertical)
-	{
-		area.h = INFINITY;
-	}
 	m_Overflowing = false;
 
 	// Currently used as vec2, but may be useful to keep as area for fancy content-alignment later
@@ -91,10 +90,22 @@ RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const Erm::vec2f& a
 	{
 		// The canvas the child element is allowed to use (container behaviour)
 		const auto availableRenderArea = GetAreaForChild(area, usedArea, ctx);
-		const auto availableDimensions = availableRenderArea.GetDimensions();
+		auto availableDimensions = availableRenderArea.GetDimensions();
 		const auto availablePosition = availableRenderArea.GetPosition();
 
 		++ctx.childIndex;
+
+
+		if (!RenderArea{0.f, 0.f, availableArea.x, availableArea.y}.Contains(availableRenderArea))
+		{
+			m_Overflowing = true;
+
+			if (m_VerticalOverflow != Overflow::Hidden)
+			{
+				area.h = INFINITY;
+				availableDimensions.h = INFINITY;
+			}
+		}
 
 		// Traverse widget tree, let widgets take up all or part of the available space
 		auto& usedByChild = m_RenderAreaPerRenderable.emplace_back(
@@ -104,15 +115,11 @@ RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const Erm::vec2f& a
 
 		// Track the total area used
 		usedArea = GetCombinedBounds(usedArea, usedByChild);
-
-		if (usedArea.h - m_ScrollAmount > area.h + area.y)
-		{
-			m_Overflowing = true;
-		}
 	}
 
 	// // Content aware operations
 	// Align helper does the same as the leaf node class in CalculateContentArea. This is really a renderArea-specific pass that we could call on all the children and then ourselves here.
+	// AD: we also duplicated background between leaf and container node. Is this pointing to a base widget class?
 	const auto offset = m_AlignHelper.GetOffsets({ usedArea.w, usedArea.h }, area);
 	const auto scale = m_AlignHelper.GetScales({ usedArea.w, usedArea.h }, area);
 
@@ -128,10 +135,7 @@ RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const Erm::vec2f& a
 		renderArea.h *= scale.h;
 	}
 
-	if (m_ScrollVertical)
-	{
-		usedArea.h = std::min(usedArea.h, availableArea.h);
-	}
+	usedArea.h = std::min(usedArea.h, availableArea.h);
 
 	return usedArea;
 }
@@ -264,7 +268,15 @@ void RUIN::UIContainer::InitializeVerticalOverflow(const char* mode)
 
 	if (strcmp(mode, "scroll") == 0)
 	{
-		m_ScrollVertical = true;
+		m_VerticalOverflow = Overflow::Scroll;
+ 	}
+	if (strcmp(mode, "visible") == 0)
+	{
+		m_VerticalOverflow = Overflow::Visible;
+ 	}
+	if (strcmp(mode, "hidden") == 0)
+	{
+		m_VerticalOverflow = Overflow::Hidden;
  	}
 }
 
@@ -298,7 +310,7 @@ bool RUIN::UIContainer::HandleMouseUp(int cursorX, int cursorY)
 
 bool RUIN::UIContainer::HandleMouseScroll(float distance, int cursorX, int cursorY)
 {
-	if (m_ScrollVertical)
+	if (m_VerticalOverflow == Overflow::Scroll)
 	{
 		if (distance > 0.f)
 		{

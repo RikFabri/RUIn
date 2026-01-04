@@ -70,7 +70,9 @@ namespace RUIN
 
 		int m_RowNumber = 0;
 
-		bool m_ScrollVertical = false;
+	protected:
+		enum class Overflow { Hidden, Scroll, Visible };
+		Overflow m_VerticalOverflow = Overflow::Scroll;
 		float m_ScrollAmount = 0;
 		bool m_Overflowing = false;
 		
