@@ -1,5 +1,6 @@
 #pragma once
 #include "../include/RUIN.h"
+#include "MathLib.h"
 #include <cfloat>
 #include <cmath>
 
@@ -38,6 +39,22 @@ namespace RUIN
 				uint32_t(w),
 				uint32_t(h)
 			};
+		}
+
+		Erm::vec2f GetDimensions() const
+		{
+			return { w, h };
+		}
+
+		Erm::vec2f GetPosition() const
+		{
+			return { x, y };
+		}
+
+		void OffsetBy(const Erm::vec2f& offset)
+		{
+			x += offset.x;
+			y += offset.y;
 		}
 	};
 }

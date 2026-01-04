@@ -18,36 +18,36 @@ RUIN::LeafNode::LeafNode(tinyxml2::XMLElement* e)
 
 }
 
-RUIN::RenderArea RUIN::LeafNode::CalculateUsedContentArea(const RenderArea& availableArea)
+RUIN::RenderArea RUIN::LeafNode::CalculateUsedContentArea(const Erm::vec2f& availableArea)
 {
 	const auto dims = GetDimensions();
 
-	RenderArea rc = availableArea;
-	rc.w = dims.x;
-	rc.h = dims.y;
+	RenderArea usedArea{};
+	usedArea.w = dims.w;
+	usedArea.h = dims.h;
 
-	const auto offsets = m_AlignHelper.GetOffsets(dims, { availableArea.w, availableArea.h });
-	const auto scales = m_AlignHelper.GetScales(dims, { availableArea.w, availableArea.h });
+	const auto offsets = m_AlignHelper.GetOffsets(dims, availableArea);
+	const auto scales = m_AlignHelper.GetScales(dims, availableArea);
 
-	rc.w *= scales.x;
-	rc.h *= scales.y;
+	usedArea.w *= scales.x;
+	usedArea.h *= scales.y;
 
-	rc.x += offsets.x;
-	rc.y += offsets.y;
+	usedArea.x += offsets.x;
+	usedArea.y += offsets.y;
 	
-	// Fit inside of area
-	rc.w = std::min(rc.w, availableArea.w);
-	rc.h = std::min(rc.h, availableArea.h);
+	// Fit inside of area // TODO: this should be handled by alignment offsets and cliprect I think?
+	//usedArea.w = std::min(usedArea.w, availableArea.w);
+	//usedArea.h = std::min(usedArea.h, availableArea.h);
 
 	// Apply margins
 	// We use pixel / size as a ratio and apply it to calculated area.
-	rc.x += m_MarginLeft / dims.x * rc.w;
-	rc.y += m_MarginTop / dims.y * rc.h;
-	rc.w -= m_MarginRight / dims.x * rc.w;
-	rc.h -= m_MarginBottom / dims.y * rc.h;
+	usedArea.x += m_MarginLeft / dims.x * usedArea.w;
+	usedArea.y += m_MarginTop / dims.y * usedArea.h;
+	usedArea.w -= m_MarginRight / dims.x * usedArea.w;
+	usedArea.h -= m_MarginBottom / dims.y * usedArea.h;
 	// End margins
 
-	return rc;
+	return usedArea;
 }
 
 void RUIN::LeafNode::ApplyContentAwareTransormations(const Erm::vec2f&, const Erm::vec2f&)

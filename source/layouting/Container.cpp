@@ -55,10 +55,9 @@ void RUIN::UIContainer::Render(const RenderArea& renderArea)
 	int count = 0;
 	for (const auto& renderable : m_Renderables)
 	{
-		const auto& ra = m_RenderAreaPerRenderable[count++];
-
-		//if (ra.IsEmpty())
-		//	continue;
+		RenderArea ra = m_RenderAreaPerRenderable[count++];
+		ra.x += renderArea.x;
+		ra.y += renderArea.y;
 
 		renderable->Render(ra);
 	}
@@ -69,24 +68,21 @@ void RUIN::UIContainer::Render(const RenderArea& renderArea)
 	}
 }
 
-RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const RenderArea& absoluteAvailableArea)
+RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const Erm::vec2f& availableArea)
 {
 	RenderContext ctx{};
 
-	RenderArea availableArea = absoluteAvailableArea;
+	Erm::vec2f area = availableArea;
 
+	// Scrolling
 	if (m_ScrollVertical)
 	{
-		availableArea.h = INFINITY;
+		area.h = INFINITY;
 	}
-
-	// Render areas should be absolute, not relative. 
-	// This means we need to "fill in" the start position for this area
-	RenderArea usedArea{};
-	usedArea.w = availableArea.x;
-	usedArea.h = availableArea.y;
-
 	m_Overflowing = false;
+
+	// Currently used as vec2, but may be useful to keep as area for fancy content-alignment later
+	RenderArea usedArea{};
 
 	// Render areas are not exposed to leaf nodes, they're an implementation detail of containers.
 	m_RenderAreaPerRenderable.clear();
@@ -94,80 +90,54 @@ RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const RenderArea& a
 	for (auto& renderable : m_Renderables)
 	{
 		// The canvas the child element is allowed to use (container behaviour)
-		const auto available = GetAreaForChild(availableArea, usedArea, ctx);
+		const auto availableRenderArea = GetAreaForChild(area, usedArea, ctx);
+		const auto availableDimensions = availableRenderArea.GetDimensions();
+		const auto availablePosition = availableRenderArea.GetPosition();
+
 		++ctx.childIndex;
 
-		//if (available.IsEmpty())
-		//{
-		//	//continue;
-		//}
-
 		// Traverse widget tree, let widgets take up all or part of the available space
-		const auto& rendered = m_RenderAreaPerRenderable.emplace_back(renderable->CalculateUsedContentArea(available));
+		auto& usedByChild = m_RenderAreaPerRenderable.emplace_back(
+			renderable->CalculateUsedContentArea(availableDimensions));
+
+		usedByChild.OffsetBy(availablePosition);
 
 		// Track the total area used
-		usedArea.w = std::max(usedArea.w, rendered.w + rendered.x);
-		usedArea.h = std::max(usedArea.h, rendered.h + rendered.y);
+		usedArea = GetCombinedBounds(usedArea, usedByChild);
 
-		if (usedArea.h - m_ScrollAmount > absoluteAvailableArea.h + absoluteAvailableArea.y)
+		if (usedArea.h - m_ScrollAmount > area.h + area.y)
 		{
 			m_Overflowing = true;
 		}
 	}
 
+	// // Content aware operations
 	// Align helper does the same as the leaf node class in CalculateContentArea. This is really a renderArea-specific pass that we could call on all the children and then ourselves here.
-	const auto offset = m_AlignHelper.GetOffsets({ usedArea.w, usedArea.h }, { availableArea.w, availableArea.h });
-	const auto scale = m_AlignHelper.GetScales({ usedArea.w, usedArea.h }, { availableArea.w, availableArea.h });
-	usedArea.w += offset.x;
-	usedArea.h += offset.y;
+	const auto offset = m_AlignHelper.GetOffsets({ usedArea.w, usedArea.h }, area);
+	const auto scale = m_AlignHelper.GetScales({ usedArea.w, usedArea.h }, area);
 
-	// Recursively apply content-aware operations to children // TODO: This needs rethinking. Should containers even own renderareas? Should they just be relative? 
-	auto scrolledOffset = offset;
-	scrolledOffset.y -= m_ScrollAmount;
-	ApplyContentAwareTransormations(scale, scrolledOffset);
-	//for (auto& renderableArea : m_RenderAreaPerRenderable)
-	//{
-	//	renderableArea.x += offset.x;
-	//	renderableArea.y += offset.y;
+	usedArea.x += offset.x;
+	usedArea.y += offset.y - m_ScrollAmount;
+	usedArea.w *= scale.x;
+	usedArea.h *= scale.y;
 
-	//	renderableArea.x *= scale.x;
-	//	renderableArea.y *= scale.y;
-	//	renderableArea.w *= scale.x;
-	//	renderableArea.h *= scale.y;
-	//}
+	// Should scale really be applied directly to the final renderAreas?
+	for (auto& renderArea : m_RenderAreaPerRenderable)
+	{
+		renderArea.w *= scale.w;
+		renderArea.h *= scale.h;
+	}
 
-	//m_RenderArea = usedArea;
-	//m_RenderArea.y -= m_ScrollAmount;
-	//return m_RenderArea;
+	if (m_ScrollVertical)
+	{
+		usedArea.h = std::min(usedArea.h, availableArea.h);
+	}
 
-	RenderArea finalArea;
-	finalArea.x = absoluteAvailableArea.x;
-	finalArea.y = absoluteAvailableArea.y;
-	finalArea.w = std::min(usedArea.w - finalArea.x, absoluteAvailableArea.w);
-	finalArea.h = std::min(usedArea.h - finalArea.y, absoluteAvailableArea.h);
-
-	return finalArea;
+	return usedArea;
 }
 
-void RUIN::UIContainer::ApplyContentAwareTransormations(const Erm::vec2f& scales, const Erm::vec2f& offsets)
+void RUIN::UIContainer::ApplyContentAwareTransormations(const Erm::vec2f& , const Erm::vec2f& )
 {
-	int count = 0;
-	for (const auto& renderable : m_Renderables)
-	{
-		auto& ra = m_RenderAreaPerRenderable[count++];
-		ra.x += offsets.x;
-		ra.y += offsets.y;
-
-		ra.x *= scales.x;
-		ra.y *= scales.y;
-		ra.w *= scales.x;
-		ra.h *= scales.y;
-
-		//if (ra.IsEmpty())
-		//	continue;
-
-		renderable->ApplyContentAwareTransormations(scales, offsets);
-	}
 }
 
 void RUIN::UIContainer::AddChildWidget(tinyxml2::XMLElement* element)
@@ -185,6 +155,26 @@ void RUIN::UIContainer::ClearWidgets()
 {
 	m_Renderables.clear();
 	m_RenderAreaPerRenderable.clear();
+}
+
+RUIN::RenderArea RUIN::UIContainer::GetCombinedBounds(RenderArea left, RenderArea right)
+{
+	left.w += left.x;
+	left.h += left.y;
+
+	right.w += right.x;
+	right.h += right.y;
+
+	RenderArea result;
+	result.x = std::min(left.x, right.x);
+	result.y = std::min(left.y, right.y);
+	result.w = std::max(left.w, right.w);
+	result.h = std::max(left.h, right.h);
+
+	result.w -= result.x;
+	result.h -= result.y;
+
+	return result;
 }
 
 void RUIN::UIContainer::DataSourceChanged()

@@ -57,7 +57,7 @@ bool RUIN::UIManager::LoadXML(const std::string& path)
 
 void RUIN::UIManager::Update()
 {
-	RenderArea ra{};
+	Erm::vec2f ra{};
 	m_Window.CalculateUsedContentArea(ra);
 }
 

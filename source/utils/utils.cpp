@@ -56,3 +56,25 @@ RUIN_Colour RUIN::utils::ColourFromHexString(const char* str)
 
 	return col;
 }
+
+RUIN_Colour RUIN::utils::GetNextColour()
+{
+	static int idx = 0;
+
+	static const RUIN_Colour cols[] =
+	{
+		{255,   0,   0, 255}, // Red
+		{255, 127,   0, 255}, // Orange
+		{255, 255,   0, 255}, // Yellow
+		{  0, 255,   0, 255}, // Green
+		{  0,   0, 255, 255}, // Blue
+		{ 75,   0, 130, 255}, // Indigo
+		{148,   0, 211, 255}  // Violet
+	};
+
+
+	RUIN_Colour res = cols[idx];
+	idx = (idx + 1) % (sizeof(cols) / sizeof(RUIN_Colour));
+
+	return res;
+}

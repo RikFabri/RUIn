@@ -17,7 +17,7 @@ namespace RUIN
 		UIContainer(tinyxml2::XMLElement* element);
 
 		void Render(const RenderArea& targetArea) override;
-		RenderArea CalculateUsedContentArea(const RenderArea& availableArea) override;
+		RenderArea CalculateUsedContentArea(const Erm::vec2f& availableArea) override;
 		void ApplyContentAwareTransormations(const Erm::vec2f& scales, const Erm::vec2f& offsets) override;
 
 		bool HandleMouseMoved(int cursorX, int cursorY) override;
@@ -43,10 +43,12 @@ namespace RUIN
 
 
 	private:
-		virtual RUIN::RenderArea GetAreaForChild(const RenderArea& availableArea, const RenderArea& usedArea, const RenderContext& ctx) const = 0;
+		virtual RUIN::RenderArea GetAreaForChild(const Erm::vec2f& availableArea, const RenderArea& usedArea, const RenderContext& ctx) const = 0;
 
 		template<typename FuncType, typename... Args>
 		inline bool HandleMouseEventGeneric(int cursorX, int cursorY, FuncType&& func, Args&&... args);
+
+		static RenderArea GetCombinedBounds(RenderArea left, RenderArea right);
 
 		void DataSourceChanged();
 

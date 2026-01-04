@@ -30,20 +30,20 @@ Erm::vec2f RUIN::AlignHelper::GetOffsets(Erm::vec2f dimensions, Erm::vec2f avail
 	switch (m_HorizontalFillMode)
 	{
 	case FillMode::Center:
-		offset.x += (availableArea.x - dimensions.x) / 2.f;
+		offset.x += (availableArea.w - dimensions.w) / 2.f;
 		break;
 	case FillMode::Right:
-		offset.x += availableArea.x - dimensions.x;
+		offset.x += availableArea.w - dimensions.w;
 		break;
 	}
 
 	switch (m_VerticalFillMode)
 	{
 	case FillMode::Center:
-		offset.y += (availableArea.y - dimensions.y) / 2.f;
+		offset.y += (availableArea.h - dimensions.h) / 2.f;
 		break;
 	case FillMode::Right:
-		offset.y += availableArea.y - dimensions.y;
+		offset.y += availableArea.h - dimensions.h;
 		break;
 	}
 

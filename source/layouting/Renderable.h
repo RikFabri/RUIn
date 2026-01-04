@@ -14,7 +14,7 @@ namespace RUIN
 		virtual void Render(const RenderArea& targetArea) = 0;
 
 		// Return what area you're using within the available area.
-		virtual RenderArea CalculateUsedContentArea(const RenderArea& availableArea) = 0;
+		virtual RenderArea CalculateUsedContentArea(const Erm::vec2f& availableArea) = 0;
 		virtual void ApplyContentAwareTransormations(const Erm::vec2f& scales, const Erm::vec2f& offsets) = 0;
 
 		// // Input events. Return true if you handled the input, false to let them propagate.

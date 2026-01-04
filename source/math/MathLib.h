@@ -72,8 +72,15 @@ namespace Erm
 
 	struct vec2f
 	{
-		float32 x;
-		float32 y;
+		union {
+			float32 x;
+			float32 w;
+		};
+
+		union {
+			float32 y;
+			float32 h;
+		};
 
 		vec2f() = default;
 

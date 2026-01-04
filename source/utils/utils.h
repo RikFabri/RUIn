@@ -6,5 +6,6 @@ namespace RUIN
 namespace utils
 {
 	RUIN_Colour ColourFromHexString(const char* str);
+	RUIN_Colour GetNextColour();
 }
 }

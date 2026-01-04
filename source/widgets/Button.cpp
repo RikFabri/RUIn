@@ -30,11 +30,13 @@ void RUIN::Button::Render(const RenderArea& targetArea)
 	}
 }
 
-RUIN::RenderArea RUIN::Button::GetAreaForChild(const RenderArea& availableArea, const RenderArea& , const RenderContext& ) const
+RUIN::RenderArea RUIN::Button::GetAreaForChild(const Erm::vec2f& availableArea, const RenderArea& , const RenderContext&) const
 {
-	RenderArea rc = availableArea;
+	RenderArea childArea{};
+	childArea.w = availableArea.w;
+	childArea.h = availableArea.h;
 
-	return rc;
+	return childArea;
 }
 
 bool RUIN::Button::HandleMouseMoved(int, int)
