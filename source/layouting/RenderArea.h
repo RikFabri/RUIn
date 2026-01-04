@@ -1,5 +1,7 @@
 #pragma once
 #include "../include/RUIN.h"
+#include <cfloat>
+#include <cmath>
 
 namespace RUIN
 {
@@ -19,6 +21,13 @@ namespace RUIN
 		bool ContainsPoint(int px, int py) const
 		{
 			return x <= px && y <= py && x + w >= px && y + h >= py;
+		}
+
+		bool IsEmpty() const
+		{
+			return 
+				abs(w) < FLT_EPSILON ||
+				abs(h) < FLT_EPSILON;
 		}
 
 		RUIN_Rectangle GetRect() const

@@ -104,6 +104,7 @@ namespace RUIN
 	{
 		const auto bindings = m_Bindings.QueryRow<QueryByNameAndContext>({ bindingName, bindingContextId });
 
+		if (bindings.empty()) return; // TODO: make this warnings instead?
 		RASSERT(bindings.size() == 1, std::format("Could not find matching binding! \"{}\"", bindingName).c_str());
 
 		const auto& bindingData = *bindings[0];
@@ -118,6 +119,7 @@ namespace RUIN
 	{
 		const auto bindings = m_Bindings.QueryRow<QueryByName>(bindingName);
 
+		if (bindings.empty()) return; // TODO: make this warnings instead?
 		RASSERT(bindings.size() > 0, "Could not find any matching bindings!");
 
 		for (auto* binding : bindings)

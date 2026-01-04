@@ -69,6 +69,7 @@ API void RUIN_SetWindowDimensions(unsigned width, unsigned height);
 API void RUIN_CursorMoved(int cursorX, int cursorY);
 API void RUIN_CursorUp(int cursorX, int cursorY);
 API void RUIN_CursorDown(int cursorX, int cursorY);
+API void RUIN_ScrollWheel(float change, int cursorX, int cursorY);
 
 // Data binding
 API void RUIN_SetBindValuei(const char* bindingName, int value);

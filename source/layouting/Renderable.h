@@ -1,5 +1,6 @@
 #pragma once
 #include "RenderArea.h"
+#include "MathLib.h"
 #include "../widgets/databinding/DataBinding.h"
 
 namespace RUIN
@@ -14,11 +15,13 @@ namespace RUIN
 
 		// Return what area you're using within the available area.
 		virtual RenderArea CalculateUsedContentArea(const RenderArea& availableArea) = 0;
+		virtual void ApplyContentAwareTransormations(const Erm::vec2f& scales, const Erm::vec2f& offsets) = 0;
 
 		// // Input events. Return true if you handled the input, false to let them propagate.
 		virtual bool HandleMouseMoved(int cursorX, int cursorY);
 		virtual bool HandleMouseDown(int cursorX, int cursorY);
 		virtual bool HandleMouseUp(int cursorX, int cursorY);
+		virtual bool HandleMouseScroll(float distance, int cursorX, int cursorY);
 
 		virtual size_t PatchAllDataFromBuffer(const void* buffer, unsigned bufferSize) = 0;
 

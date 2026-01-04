@@ -12,5 +12,6 @@ void RUIN::AssertAndReport(bool isOkay, const char* errorMessage)
 	}
 
 	UIManager::GetInstance().SetErrorMessage(errorMessage);
+	std::cerr << errorMessage << std::endl;
 	assert(false);
 }

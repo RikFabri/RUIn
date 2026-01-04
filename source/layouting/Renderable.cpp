@@ -15,6 +15,11 @@ bool RUIN::IRenderable::HandleMouseUp(int, int)
 	return false;
 }
 
+bool RUIN::IRenderable::HandleMouseScroll(float, int, int)
+{
+	return false;
+}
+
 int RUIN::IRenderable::GetRowNumber() const
 {
 	return 0;

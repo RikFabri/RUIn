@@ -28,6 +28,7 @@ namespace RUIN
 		void OnCursorMoved(int cursorX, int cursorY);
 		void OnCursorDown(int cursorX, int cursorY);
 		void OnCursorUp(int cursorX, int cursorY);
+		void OnScrolled(float distance, int cursorX, int cursorY);
 
 		void RegisterNamedCallback(const std::string& name, std::function<void()> func);
 		void InvokeNamedCallback(const std::string& name) const;

@@ -17,20 +17,20 @@ void RUIN::Button::Render(const RenderArea& targetArea)
 	{
 		UIManager::GetInstance().DrawRectangle(targetArea, { 0, 0, 0, 64 });
 
-		// TODO: this could get messy if client were to tick RUIN outside of system events, which might be needed for animations and transitions later on.
-		m_ButtonState = ButtonState::Default;
+		//// TODO: this could get messy if client were to tick RUIN outside of system events, which might be needed for animations and transitions later on.
+		//m_ButtonState = ButtonState::Default;
 	}
 
 	if (m_ButtonState == ButtonState::Down)
 	{
 		UIManager::GetInstance().DrawRectangle(targetArea, { 0, 0, 0, 128 });
 
-		// TODO: this could get messy if client were to tick RUIN outside of system events, which might be needed for animations and transitions later on.
-		m_ButtonState = ButtonState::Default;
+		//// TODO: this could get messy if client were to tick RUIN outside of system events, which might be needed for animations and transitions later on.
+		//m_ButtonState = ButtonState::Default;
 	}
 }
 
-RUIN::RenderArea RUIN::Button::GetAreaForChild(const RenderArea& availableArea, RenderArea&, RenderContext&) const
+RUIN::RenderArea RUIN::Button::GetAreaForChild(const RenderArea& availableArea, const RenderArea& , const RenderContext& ) const
 {
 	RenderArea rc = availableArea;
 

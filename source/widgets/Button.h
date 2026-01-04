@@ -15,7 +15,7 @@ namespace RUIN
 
 	private:
 
-		RenderArea GetAreaForChild(const RenderArea& availableArea, RenderArea& usedArea, RenderContext& ctx) const override;
+		RenderArea GetAreaForChild(const RenderArea& availableArea, const RenderArea& usedArea, const RenderContext& ctx) const override;
 		bool HandleMouseMoved(int cursorX, int cursorY) override;
 		bool HandleMouseDown(int cursorX, int cursorY) override;
 		bool HandleMouseUp(int cursorX, int cursorY) override;

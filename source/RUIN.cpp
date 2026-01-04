@@ -61,6 +61,11 @@ void RUIN_CursorDown(int cursorX, int cursorY)
     UIManager::GetInstance().OnCursorDown(cursorX, cursorY);
 }
 
+void RUIN_ScrollWheel(float change, int cursorX, int cursorY)
+{
+    UIManager::GetInstance().OnScrolled(change, cursorX, cursorY);
+}
+
 void RUIN_SetBindValuei(const char* bindingName, int value)
 {
     UIManager::GetInstance().GetBindingDatabase().SetDataOnBinding<int>(bindingName, value);

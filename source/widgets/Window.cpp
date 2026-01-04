@@ -24,7 +24,7 @@ void RUIN::Window::SetDimensions(unsigned width, unsigned height)
 	m_Height = (float)height;
 }
 
-RUIN::RenderArea RUIN::Window::GetAreaForChild(const RenderArea&, RenderArea&, RenderContext&) const
+RUIN::RenderArea RUIN::Window::GetAreaForChild(const RenderArea& , const RenderArea& , const RenderContext& ) const
 {
 	RenderArea ra{};
 	ra.w = m_Width;

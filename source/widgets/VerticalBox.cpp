@@ -6,20 +6,21 @@ RUIN::VerticalBox::VerticalBox(tinyxml2::XMLElement* e)
 	e->QueryBoolAttribute("isFlexible", &m_Flex);
 }
 
-RUIN::RenderArea RUIN::VerticalBox::GetAreaForChild(const RenderArea& availableArea, RenderArea& usedArea, RenderContext& ctx) const
+RUIN::RenderArea RUIN::VerticalBox::GetAreaForChild(const RenderArea& availableArea, const RenderArea& usedArea, const RenderContext& ctx) const
 {
-	RenderArea rc = availableArea;
+	RenderArea ra = availableArea;
 
 	if (!m_Flex)
 	{
 		const float height = availableArea.h / GetNumChildren();
-		rc.h = height;
-		rc.y += height * ctx.childIndex;
+		ra.h = height;
+		ra.y += height * ctx.childIndex;
 	}
 	else
 	{
-		rc.y = usedArea.h;
+		ra.y = usedArea.h;
+		ra.h -= usedArea.h;
 	}
 
-	return rc;
+	return ra;
 }

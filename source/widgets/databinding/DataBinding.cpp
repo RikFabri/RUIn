@@ -35,6 +35,7 @@ void RUIN::XMLBindingCreationHelper::InitializeMethod(void(*method)(void*, const
 	if (isBinding)
 	{
 		// TODO: We should probably union this instead
+		// TODO: Do we even need the offset? If we always store the instance ptr too, maybe we should just store member and method pointers instead.
 		static_assert(sizeof(method) >= sizeof(size_t), "We're reusing the offset field to store method pointers.");
 
 		AddBinding(instance, typeid(std::string).hash_code(), (size_t)method, sizeof(void*), bindingName, BindingDatabase::BindingType::FUNCTION);

@@ -18,11 +18,12 @@ namespace RUIN
 
 		void Render(const RenderArea& targetArea) override;
 		RenderArea CalculateUsedContentArea(const RenderArea& availableArea) override;
-
+		void ApplyContentAwareTransormations(const Erm::vec2f& scales, const Erm::vec2f& offsets) override;
 
 		bool HandleMouseMoved(int cursorX, int cursorY) override;
 		bool HandleMouseDown(int cursorX, int cursorY) override;
 		bool HandleMouseUp(int cursorX, int cursorY) override;
+		bool HandleMouseScroll(float distance, int cursorX, int cursorY) override;
 		
 		size_t PatchAllDataFromBuffer(const void* buffer, unsigned bufferSize) override;
 		void SetRowNumber(int row) override;
@@ -42,17 +43,22 @@ namespace RUIN
 
 
 	private:
-		virtual RenderArea GetAreaForChild(const RenderArea& availableArea, RenderArea& usedArea, RenderContext& ctx) const = 0;
+		virtual RUIN::RenderArea GetAreaForChild(const RenderArea& availableArea, const RenderArea& usedArea, const RenderContext& ctx) const = 0;
 
-		bool HandleMouseEventGeneric(int cursorX, int cursorY, std::function<bool(IRenderable*, int, int)> func);
+		template<typename FuncType, typename... Args>
+		inline bool HandleMouseEventGeneric(int cursorX, int cursorY, FuncType&& func, Args&&... args);
+
 		void DataSourceChanged();
 
 		size_t InstantiateItemTemplate(size_t sourceStreamOffset);
 
 		void InitializeVerticalFillmode(const char* mode);
 		void InitializeHorizontalFillmode(const char* mode);
+		void InitializeVerticalOverflow(const char* mode);
+		void InitializeBackgroundColour(const char* col);
 
 		AlignHelper m_AlignHelper;
+		RenderArea m_RenderArea;
 
 		std::vector<std::unique_ptr<IRenderable>> m_Renderables;
 		std::vector<RenderArea> m_RenderAreaPerRenderable;
@@ -61,6 +67,38 @@ namespace RUIN
 		std::string m_ItemTemplate;
 
 		int m_RowNumber = 0;
+
+		bool m_ScrollVertical = false;
+		float m_ScrollAmount = 0;
+		bool m_Overflowing = false;
+		
+		RUIN_Colour m_BackgroundColour = { 0, 0, 0, 0 };
 	};
 
+	template<typename FuncType, typename... Args>
+	inline bool UIContainer::HandleMouseEventGeneric(int cursorX, int cursorY, FuncType&& func, Args&& ...args)
+	{
+		int count = 0;
+		for (auto& renderable : m_Renderables)
+		{
+			if (count >= m_RenderAreaPerRenderable.size())
+			{
+				return false;
+			}
+
+			const auto& renderArea = m_RenderAreaPerRenderable[count++];
+
+			if (renderArea.ContainsPoint(cursorX, cursorY))
+			{
+				const bool handled = std::forward<FuncType>(func)(renderable.get(), cursorX, cursorY, std::forward<Args>(args)...);
+				if (handled)
+				{
+					return true;
+				}
+			}
+
+		}
+
+		return false;
+	}
 }

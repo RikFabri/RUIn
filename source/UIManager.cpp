@@ -89,6 +89,11 @@ void RUIN::UIManager::OnCursorUp(int cursorX, int cursorY)
 	m_Window.HandleMouseUp(cursorX, cursorY);
 }
 
+void RUIN::UIManager::OnScrolled(float distance, int cursorX, int cursorY)
+{
+	m_Window.HandleMouseScroll(distance, cursorX, cursorY);
+}
+
 void RUIN::UIManager::RegisterNamedCallback(const std::string& name, std::function<void()> func)
 {
 	m_NamedUserCallbacks[name] = func;
@@ -96,7 +101,7 @@ void RUIN::UIManager::RegisterNamedCallback(const std::string& name, std::functi
 
 void RUIN::UIManager::InvokeNamedCallback(const std::string& name) const
 {
-	RASSERT(m_NamedUserCallbacks.contains(name), std::format("Named callback {} wasn't registered!", name).c_str());
+	RASSERT(m_NamedUserCallbacks.contains(name), "Named callback {} wasn't registered!");
 
 	m_NamedUserCallbacks.at(name)();
 }

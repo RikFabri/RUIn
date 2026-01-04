@@ -5,6 +5,9 @@
 #include "../widgets/Label.h"
 #include "../UIManager.h"
 
+#include "../widgets/VerticalBox.h"
+
+#include "../utils/utils.h"
 
 RUIN::UIContainer::UIContainer(tinyxml2::XMLElement* element)
 {
@@ -15,6 +18,8 @@ RUIN::UIContainer::UIContainer(tinyxml2::XMLElement* element)
 
 	Bind_method_to_XML(InitializeHorizontalFillmode, element, "horizontal-fillMode");
 	Bind_method_to_XML(InitializeVerticalFillmode, element, "vertical-fillMode");
+	Bind_method_to_XML(InitializeVerticalOverflow, element, "vertical-overflow");
+	Bind_method_to_XML(InitializeBackgroundColour, element, "background-colour");
 	Bind_member_to_XML(m_DataSource, element, "datasource").OnChange(DataSourceChanged);
 
 	for (auto* e = element->FirstChildElement(); e; e = e->NextSiblingElement())
@@ -36,25 +41,52 @@ RUIN::UIContainer::UIContainer(tinyxml2::XMLElement* element)
 	}
 }
 
-void RUIN::UIContainer::Render(const RenderArea&)
+void RUIN::UIContainer::Render(const RenderArea& renderArea)
 {
+	// TODO: This is duplicated in UIContainer and LeafNode
+	UIManager::GetInstance().DrawRectangle(renderArea, m_BackgroundColour);
+
+	// TODO: fix up how/when we apply cliprects
+	if (m_ScrollVertical)
+	{
+		UIManager::GetInstance().SetClipRect(renderArea);
+	}
+
 	int count = 0;
 	for (const auto& renderable : m_Renderables)
 	{
 		const auto& ra = m_RenderAreaPerRenderable[count++];
+
+		//if (ra.IsEmpty())
+		//	continue;
+
 		renderable->Render(ra);
+	}
+
+	if (m_ScrollVertical)
+	{
+		UIManager::GetInstance().SetClipRect(std::nullopt);
 	}
 }
 
-RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const RenderArea& availableArea)
+RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const RenderArea& absoluteAvailableArea)
 {
 	RenderContext ctx{};
+
+	RenderArea availableArea = absoluteAvailableArea;
+
+	if (m_ScrollVertical)
+	{
+		availableArea.h = INFINITY;
+	}
 
 	// Render areas should be absolute, not relative. 
 	// This means we need to "fill in" the start position for this area
 	RenderArea usedArea{};
 	usedArea.w = availableArea.x;
 	usedArea.h = availableArea.y;
+
+	m_Overflowing = false;
 
 	// Render areas are not exposed to leaf nodes, they're an implementation detail of containers.
 	m_RenderAreaPerRenderable.clear();
@@ -63,16 +95,24 @@ RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const RenderArea& a
 	{
 		// The canvas the child element is allowed to use (container behaviour)
 		const auto available = GetAreaForChild(availableArea, usedArea, ctx);
+		++ctx.childIndex;
+
+		//if (available.IsEmpty())
+		//{
+		//	//continue;
+		//}
 
 		// Traverse widget tree, let widgets take up all or part of the available space
-		m_RenderAreaPerRenderable.emplace_back(renderable->CalculateUsedContentArea(available));
-		const auto& rendered = m_RenderAreaPerRenderable[ctx.childIndex];
-		assert(ctx.childIndex == m_RenderAreaPerRenderable.size() - 1);
+		const auto& rendered = m_RenderAreaPerRenderable.emplace_back(renderable->CalculateUsedContentArea(available));
 
 		// Track the total area used
 		usedArea.w = std::max(usedArea.w, rendered.w + rendered.x);
 		usedArea.h = std::max(usedArea.h, rendered.h + rendered.y);
-		++ctx.childIndex;
+
+		if (usedArea.h - m_ScrollAmount > absoluteAvailableArea.h + absoluteAvailableArea.y)
+		{
+			m_Overflowing = true;
+		}
 	}
 
 	// Align helper does the same as the leaf node class in CalculateContentArea. This is really a renderArea-specific pass that we could call on all the children and then ourselves here.
@@ -81,19 +121,53 @@ RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const RenderArea& a
 	usedArea.w += offset.x;
 	usedArea.h += offset.y;
 
-	// Apply content-aware operations to children
-	for (auto& renderableArea : m_RenderAreaPerRenderable)
+	// Recursively apply content-aware operations to children // TODO: This needs rethinking. Should containers even own renderareas? Should they just be relative? 
+	auto scrolledOffset = offset;
+	scrolledOffset.y -= m_ScrollAmount;
+	ApplyContentAwareTransormations(scale, scrolledOffset);
+	//for (auto& renderableArea : m_RenderAreaPerRenderable)
+	//{
+	//	renderableArea.x += offset.x;
+	//	renderableArea.y += offset.y;
+
+	//	renderableArea.x *= scale.x;
+	//	renderableArea.y *= scale.y;
+	//	renderableArea.w *= scale.x;
+	//	renderableArea.h *= scale.y;
+	//}
+
+	//m_RenderArea = usedArea;
+	//m_RenderArea.y -= m_ScrollAmount;
+	//return m_RenderArea;
+
+	RenderArea finalArea;
+	finalArea.x = absoluteAvailableArea.x;
+	finalArea.y = absoluteAvailableArea.y;
+	finalArea.w = std::min(usedArea.w - finalArea.x, absoluteAvailableArea.w);
+	finalArea.h = std::min(usedArea.h - finalArea.y, absoluteAvailableArea.h);
+
+	return finalArea;
+}
+
+void RUIN::UIContainer::ApplyContentAwareTransormations(const Erm::vec2f& scales, const Erm::vec2f& offsets)
+{
+	int count = 0;
+	for (const auto& renderable : m_Renderables)
 	{
-		renderableArea.x += offset.x;
-		renderableArea.y += offset.y;
+		auto& ra = m_RenderAreaPerRenderable[count++];
+		ra.x += offsets.x;
+		ra.y += offsets.y;
 
-		renderableArea.x *= scale.x;
-		renderableArea.y *= scale.y;
-		renderableArea.w *= scale.x;
-		renderableArea.h *= scale.y;
+		ra.x *= scales.x;
+		ra.y *= scales.y;
+		ra.w *= scales.x;
+		ra.h *= scales.y;
+
+		//if (ra.IsEmpty())
+		//	continue;
+
+		renderable->ApplyContentAwareTransormations(scales, offsets);
 	}
-
-	return usedArea;
 }
 
 void RUIN::UIContainer::AddChildWidget(tinyxml2::XMLElement* element)
@@ -111,32 +185,6 @@ void RUIN::UIContainer::ClearWidgets()
 {
 	m_Renderables.clear();
 	m_RenderAreaPerRenderable.clear();
-}
-
-bool RUIN::UIContainer::HandleMouseEventGeneric(int cursorX, int cursorY, std::function<bool(IRenderable*, int, int)> func)
-{
-	int count = 0;
-	for (auto& renderable : m_Renderables)
-	{
-		if (count >= m_RenderAreaPerRenderable.size())
-		{
-			return false;
-		}
-
-		const auto& renderArea = m_RenderAreaPerRenderable[count++];
-
-		if (renderArea.ContainsPoint(cursorX, cursorY))
-		{
-			const bool handled = func(renderable.get(), cursorX, cursorY);
-			if (handled)
-			{
-				return true;
-			}
-		}
-
-	}
-
-	return false;
 }
 
 void RUIN::UIContainer::DataSourceChanged()
@@ -219,6 +267,22 @@ void RUIN::UIContainer::InitializeHorizontalFillmode(const char* mode)
 	m_AlignHelper.SetHorizontalFillMode(mode);
 }
 
+void RUIN::UIContainer::InitializeVerticalOverflow(const char* mode)
+{
+	if (!mode)
+		return;
+
+	if (strcmp(mode, "scroll") == 0)
+	{
+		m_ScrollVertical = true;
+ 	}
+}
+
+void RUIN::UIContainer::InitializeBackgroundColour(const char* col)
+{
+	m_BackgroundColour = utils::ColourFromHexString(col);
+}
+
 bool RUIN::UIContainer::HandleMouseMoved(int cursorX, int cursorY)
 {
 	return HandleMouseEventGeneric(cursorX, cursorY, [](IRenderable* obj, int x, int y) -> bool { return obj->HandleMouseMoved(x, y); });
@@ -231,7 +295,33 @@ bool RUIN::UIContainer::HandleMouseDown(int cursorX, int cursorY)
 
 bool RUIN::UIContainer::HandleMouseUp(int cursorX, int cursorY)
 {
-	return HandleMouseEventGeneric(cursorX, cursorY, [](IRenderable* obj, int x, int y) -> bool { return obj->HandleMouseUp(x, y); });
+	//auto* ptr = dynamic_cast<VerticalBox*>(this);
+	//if (!ptr)
+		return HandleMouseEventGeneric(cursorX, cursorY, [](IRenderable* obj, int x, int y) -> bool { return obj->HandleMouseUp(x, y); });
+
+	//(void)cursorX;
+	//(void)cursorY;
+	//m_ScrollAmount += 5;
+
+	//return true;
+}
+
+bool RUIN::UIContainer::HandleMouseScroll(float distance, int cursorX, int cursorY)
+{
+	if (m_ScrollVertical)
+	{
+		if (distance > 0.f)
+		{
+			m_ScrollAmount = std::max(m_ScrollAmount - distance, 0.f);
+			return true;
+		} else if (distance < 0.f && m_Overflowing)
+		{
+			m_ScrollAmount = std::max(m_ScrollAmount - distance, 0.f);
+			return true;
+		}
+	}
+
+	return HandleMouseEventGeneric(cursorX, cursorY, [](IRenderable* obj, int x, int y, float distance) -> bool { return obj->HandleMouseScroll(distance, x, y); }, distance);
 }
 
 size_t RUIN::UIContainer::PatchAllDataFromBuffer(const void* buffer, unsigned bufferSize)
