@@ -1,21 +1,6 @@
 #include "Renderable.h"
 
-bool RUIN::IRenderable::HandleMouseMoved(int, int)
-{
-	return false;
-}
-
-bool RUIN::IRenderable::HandleMouseDown(int, int)
-{
-	return false;
-}
-
-bool RUIN::IRenderable::HandleMouseUp(int, int)
-{
-	return false;
-}
-
-bool RUIN::IRenderable::HandleMouseScroll(float, int, int)
+bool RUIN::IRenderable::PropagateEvent(const Erm::vec2f&, int, int, const Event&)
 {
 	return false;
 }

@@ -16,9 +16,7 @@ namespace RUIN
 	private:
 
 		RenderArea GetAreaForChild(const Erm::vec2f& availableArea, const RenderArea& usedArea, const RenderContext& ctx) const override;
-		bool HandleMouseMoved(int cursorX, int cursorY) override;
-		bool HandleMouseDown(int cursorX, int cursorY) override;
-		bool HandleMouseUp(int cursorX, int cursorY) override;
+		bool PropagateEvent(const Erm::vec2f& position, int cursorX, int cursorY, const Event& event) override;
 
 		enum class ButtonState
 		{

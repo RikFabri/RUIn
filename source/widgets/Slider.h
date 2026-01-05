@@ -12,9 +12,7 @@ namespace RUIN
 	private:
 		void Render(const RenderArea& targetArea) override;
 		Erm::vec2f GetDimensions() override;
-		bool HandleMouseMoved(int cursorX, int cursorY) override;
-		bool HandleMouseDown(int cursorX, int cursorY) override;
-		bool HandleMouseUp(int cursorX, int cursorY) override;
+		bool PropagateEvent(const Erm::vec2f& position, int cursorX, int cursorY, const Event& event) override;
 
 		float ValueToPercentage(float val) const;
 		float OffsetToValue(float offset) const;

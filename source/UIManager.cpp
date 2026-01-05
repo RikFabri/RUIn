@@ -76,22 +76,26 @@ void RUIN::UIManager::SetWindowSize(unsigned width, unsigned height)
 
 void RUIN::UIManager::OnCursorMoved(int cursorX, int cursorY)
 {
-	m_Window.HandleMouseMoved(cursorX, cursorY);
+	const auto e = Event::MouseMovedEvent();
+	m_Window.PropagateEvent(Erm::vec2f{}, cursorX, cursorY, e);
 }
 
 void RUIN::UIManager::OnCursorDown(int cursorX, int cursorY)
 {
-	m_Window.HandleMouseDown(cursorX, cursorY);
+	const auto e = Event::MouseDownEvent();
+	m_Window.PropagateEvent(Erm::vec2f{}, cursorX, cursorY, e);
 }
 
 void RUIN::UIManager::OnCursorUp(int cursorX, int cursorY)
 {
-	m_Window.HandleMouseUp(cursorX, cursorY);
+	const auto e = Event::MouseUpEvent();
+	m_Window.PropagateEvent(Erm::vec2f{}, cursorX, cursorY, e);
 }
 
 void RUIN::UIManager::OnScrolled(float distance, int cursorX, int cursorY)
 {
-	m_Window.HandleMouseScroll(distance, cursorX, cursorY);
+	const auto e = Event::ScrollEvent(distance);
+	m_Window.PropagateEvent(Erm::vec2f{}, cursorX, cursorY, e);
 }
 
 void RUIN::UIManager::RegisterNamedCallback(const std::string& name, std::function<void()> func)

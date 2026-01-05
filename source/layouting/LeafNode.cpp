@@ -50,10 +50,6 @@ RUIN::RenderArea RUIN::LeafNode::CalculateUsedContentArea(const Erm::vec2f& avai
 	return usedArea;
 }
 
-void RUIN::LeafNode::ApplyContentAwareTransormations(const Erm::vec2f&, const Erm::vec2f&)
-{
-}
-
 size_t RUIN::LeafNode::PatchAllDataFromBuffer(const void* buffer, unsigned bufferSize)
 {
 	return UIManager::GetInstance().GetBindingDatabase().PatchWidgetDataFromBuffer(buffer, bufferSize, this);

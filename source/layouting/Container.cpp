@@ -140,8 +140,36 @@ RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const Erm::vec2f& a
 	return usedArea;
 }
 
-void RUIN::UIContainer::ApplyContentAwareTransormations(const Erm::vec2f& , const Erm::vec2f& )
+bool RUIN::UIContainer::PropagateEvent(const Erm::vec2f& position, int cursorX, int cursorY, const Event& event)
 {
+	if (event.Is(EventType::MouseScroll))
+	{
+		if (HandleMouseScroll(event))
+			return true;
+	}
+
+	int count = 0;
+	for (auto& renderable : m_Renderables)
+	{
+		if (count >= m_RenderAreaPerRenderable.size())
+		{
+			return false;
+		}
+
+		auto renderArea = m_RenderAreaPerRenderable[count++];
+		renderArea.OffsetBy(position);
+
+		if (renderArea.ContainsPoint(cursorX, cursorY))
+		{
+			const bool handled = renderable->PropagateEvent(renderArea.GetPosition(), cursorX, cursorY, event);
+			if (handled)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 void RUIN::UIContainer::AddChildWidget(tinyxml2::XMLElement* element)
@@ -159,6 +187,19 @@ void RUIN::UIContainer::ClearWidgets()
 {
 	m_Renderables.clear();
 	m_RenderAreaPerRenderable.clear();
+}
+
+bool RUIN::UIContainer::HandleMouseScroll(const Event& event)
+{
+	const float distance = event.GetMouseScrollData().scrollAmount;
+
+	if (m_VerticalOverflow != Overflow::Scroll) return false;
+	if (!m_Overflowing) return false;
+	if (distance == 0.f) return false;
+
+	m_ScrollAmount = std::max(m_ScrollAmount - distance, 0.f);
+
+	return true;
 }
 
 RUIN::RenderArea RUIN::UIContainer::GetCombinedBounds(RenderArea left, RenderArea right)
@@ -283,47 +324,6 @@ void RUIN::UIContainer::InitializeVerticalOverflow(const char* mode)
 void RUIN::UIContainer::InitializeBackgroundColour(const char* col)
 {
 	m_BackgroundColour = utils::ColourFromHexString(col);
-}
-
-bool RUIN::UIContainer::HandleMouseMoved(int cursorX, int cursorY)
-{
-	return HandleMouseEventGeneric(cursorX, cursorY, [](IRenderable* obj, int x, int y) -> bool { return obj->HandleMouseMoved(x, y); });
-}
-
-bool RUIN::UIContainer::HandleMouseDown(int cursorX, int cursorY)
-{
-	return HandleMouseEventGeneric(cursorX, cursorY, [](IRenderable* obj, int x, int y) -> bool { return obj->HandleMouseDown(x, y); });
-}
-
-bool RUIN::UIContainer::HandleMouseUp(int cursorX, int cursorY)
-{
-	//auto* ptr = dynamic_cast<VerticalBox*>(this);
-	//if (!ptr)
-		return HandleMouseEventGeneric(cursorX, cursorY, [](IRenderable* obj, int x, int y) -> bool { return obj->HandleMouseUp(x, y); });
-
-	//(void)cursorX;
-	//(void)cursorY;
-	//m_ScrollAmount += 5;
-
-	//return true;
-}
-
-bool RUIN::UIContainer::HandleMouseScroll(float distance, int cursorX, int cursorY)
-{
-	if (m_VerticalOverflow == Overflow::Scroll)
-	{
-		if (distance > 0.f)
-		{
-			m_ScrollAmount = std::max(m_ScrollAmount - distance, 0.f);
-			return true;
-		} else if (distance < 0.f && m_Overflowing)
-		{
-			m_ScrollAmount = std::max(m_ScrollAmount - distance, 0.f);
-			return true;
-		}
-	}
-
-	return HandleMouseEventGeneric(cursorX, cursorY, [](IRenderable* obj, int x, int y, float distance) -> bool { return obj->HandleMouseScroll(distance, x, y); }, distance);
 }
 
 size_t RUIN::UIContainer::PatchAllDataFromBuffer(const void* buffer, unsigned bufferSize)

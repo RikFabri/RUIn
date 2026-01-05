@@ -39,27 +39,22 @@ RUIN::RenderArea RUIN::Button::GetAreaForChild(const Erm::vec2f& availableArea, 
 	return childArea;
 }
 
-bool RUIN::Button::HandleMouseMoved(int, int)
+bool RUIN::Button::PropagateEvent(const Erm::vec2f& , int , int , const Event& event)
 {
-	m_ButtonState = ButtonState::Hovered;
-	return true;
-}
-
-bool RUIN::Button::HandleMouseDown(int, int)
-{
-	m_ButtonState = ButtonState::Down;
-	return true;
-}
-
-bool RUIN::Button::HandleMouseUp(int, int)
-{
-	if (m_OnClick.empty())
-		return false;
-
-
-	UIManager::GetInstance().InvokeNamedCallback(m_OnClick);
-
-	m_ButtonState = ButtonState::Default;
+	switch (event.GetType())
+	{
+	case EventType::MouseDown:
+		m_ButtonState = ButtonState::Down;
+		break;
+	case EventType::MouseMoved:
+		m_ButtonState = ButtonState::Hovered;
+		break;
+	case EventType::MouseUp:
+		if (m_OnClick.empty()) return false;
+		UIManager::GetInstance().InvokeNamedCallback(m_OnClick);
+		m_ButtonState = ButtonState::Default;
+		break;
+	}
 
 	return true;
 }
