@@ -124,15 +124,18 @@ RUIN::RenderArea RUIN::UIContainer::CalculateUsedContentArea(const Erm::vec2f& a
 	const auto scale = m_AlignHelper.GetScales({ usedArea.w, usedArea.h }, area);
 
 	usedArea.x += offset.x;
-	usedArea.y += offset.y - m_ScrollAmount;
+	usedArea.y += offset.y;
 	usedArea.w *= scale.x;
 	usedArea.h *= scale.y;
+
+	m_ScrolledToEnd = (usedArea.h - m_ScrollAmount) < availableArea.h;
 
 	// Should scale really be applied directly to the final renderAreas?
 	for (auto& renderArea : m_RenderAreaPerRenderable)
 	{
 		renderArea.w *= scale.w;
 		renderArea.h *= scale.h;
+		renderArea.y -= m_ScrollAmount;
 	}
 
 	usedArea.h = std::min(usedArea.h, availableArea.h);
@@ -196,6 +199,9 @@ bool RUIN::UIContainer::HandleMouseScroll(const Event& event)
 	if (m_VerticalOverflow != Overflow::Scroll) return false;
 	if (!m_Overflowing) return false;
 	if (distance == 0.f) return false;
+	
+	// Don't allow scrolling down when at the bottom
+	if (m_ScrolledToEnd && distance < 0.f) return false;
 
 	m_ScrollAmount = std::max(m_ScrollAmount - distance, 0.f);
 

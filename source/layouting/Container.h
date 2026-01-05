@@ -63,11 +63,13 @@ namespace RUIN
 		std::string m_ItemTemplate;
 
 		int m_RowNumber = 0;
+		
+		bool m_ScrolledToEnd = true;
+		float m_ScrollAmount = 0;
 
 	protected:
 		enum class Overflow { Hidden, Scroll, Visible };
 		Overflow m_VerticalOverflow = Overflow::Hidden;
-		float m_ScrollAmount = 0;
 		bool m_Overflowing = false;
 		
 		RUIN_Colour m_BackgroundColour = { 0, 0, 0, 0 };
